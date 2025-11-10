@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+{% load static %}
+    
+{% block content %}
+
+		<div class="content-body">
+			<div class="container-fluid">
+				<div class="row">
+                    <div class="col-lg-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="email-left-box px-0 mb-3">
+                                    <div class="p-0">
+                                        <a href="/mails/?usr={{usr}}&com={{com}}" class="btn btn-primary btn-block">Nouveau</a>
+                                    </div>
+                                    <div class="mail-list mt-4">
+                                        <a href="#" class="list-group-item"><i class="fa fa-paper-plane font-18 align-middle mr-2"></i>Envoyés<span class="badge badge-primary badge-sm float-right">0</span>
+                                        </a>
+                                        <a href="#" class="list-group-item"><i class="fa fa-star-o font-18 align-middle mr-2"></i>Importants <span class="badge badge-primary badge-sm float-right">0</span>
+                                        </a>
+                                        <a href="#" class="list-group-item"><i class="fa fa-trash font-18 align-middle mr-2"></i>Supprimés<span class="badge badge-primary badge-sm float-right">0</span></a>
+                                    </div>
+                                    <div class="intro-title d-flex justify-content-between">
+                                        <h5>Categories</h5>
+                                        <i class="fa fa-chevron-down" aria-hidden="true"></i>
+                                    </div>
+                                    <div class="mail-list mt-4">
+                                        <a href="#" class="list-group-item"><span class="icon-warning"><i class="fa fa-circle" aria-hidden="true"></i></span>
+                                            Factures </a>
+                                        <a href="#" class="list-group-item"><span class="icon-primary"><i class="fa fa-circle" aria-hidden="true"></i></span>
+                                            Paiements </a>
+                                        <a href="#" class="list-group-item"><span class="icon-success"><i class="fa fa-circle" aria-hidden="true"></i></span>
+                                            Devis </a>
+                                        <a href="#" class="list-group-item"><span class="icon-success"><i class="fa fa-circle" aria-hidden="true"></i></span>
+                                            Autres </a>
+                                    </div>
+                                </div>
+                                <div class="email-right-box ml-0 ml-sm-4 ml-sm-0">
+                                    <div class="toolbar mb-4" role="toolbar">
+                                        <div class="btn-group mb-1">
+                                            <button type="button" class="btn btn-primary light px-3"><i class="fa fa-archive"></i></button>
+                                            <button type="button" class="btn btn-primary light px-3"><i class="fa fa-exclamation-circle"></i></button>
+                                            <button type="button" class="btn btn-primary light px-3"><i class="fa fa-trash"></i></button>
+                                        </div>
+                                    </div>
+                                    <div class="compose-content">
+                                        <form action="{% url 'envoie' %}" method="post" enctype="multipart/form-data">
+                                        	{% csrf_token %}
+											<input type="hidden" name="usr" value="{{usr}}">
+											<input type="hidden" name="com" value="{{com}}">
+                                            <div class="form-group">
+                                                <input type="text" class="bg-transparent form-control w-100" id="destination" name="destination" value="{{destination}}" list="acteurs" required>
+                                                <datalist id="acteurs">
+	                                            {% for i in acteurs %}
+	                                                <option value="{{i.Email}}">{{i.Email}}</option>
+	                                            {% endfor %}
+	                                        	</datalist>
+                                            </div>
+                                            <div class="form-group">
+                                            	<select class="bg-transparent default-select w-100" id="cc" name="cc">
+	                                                <option value="">-- Copie pour information à --</option>
+	                                            {% for i in utilisateurs %}
+	                                                <option value="{{i.Email}}">{{i.Email}}</option>
+	                                            {% endfor %}
+	                                        	</select>
+                                            </div>
+                                            <div class="form-group">
+                                                <textarea id="email-compose-editor" class="textarea_editor form-control bg-transparent" name="message" rows="15" placeholder="Entrer le text ...">{{message}}</textarea>
+                                            </div>
+                                        {% if not file == '' %}
+                                            <hr>
+                                            <input type="hidden" name="facture" value="{{file}}">
+                                            <div class="read-content-attachment">
+                                                <h6><i class="fa fa-download mb-2"></i> Fichiers joints
+                                                <span>(1)</span></h6>
+                                                <div class="row attachment">
+                                                    <div class="col-auto">
+                                                        <a href="/sfe_facturation/static/media/{{file}}.pdf" class="text-muted">{{file}}.pdf</a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <hr>
+                                        {% else %}
+                                            <div class="dropzone">
+                                            	<h5 class="mb-4"><i class="fa fa-paperclip"></i> Joindre un fichier</h5>
+												<div class="fallback">
+													<input name="file" type="file">
+												</div>
+											</div>
+										{% endif %}
+                                            <div class="text-left mt-4 mb-3">
+                                                <button class="btn btn-primary btn-sl-sm mr-2" type="submit"><span class="mr-2"><i class="fa fa-paper-plane"></i></span>Envoyer</button>
+                                            </div>
+										</form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+        	</div>
+        </div>
+
+        <script src="{% static 'vendor/dropzone/dist/dropzone.js' %}"></script>
+
+{% endblock %}

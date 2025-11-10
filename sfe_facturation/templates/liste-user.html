@@ -1,0 +1,264 @@
+{% extends 'base.html' %}
+{% load static %}
+		
+{% block content %}
+    <style>
+    .mode-switch {
+      display: flex;
+      justify-content: space-around;
+      border-bottom: 2px solid #ddd;
+      margin-bottom: 15px;
+    }
+    .mode-switch button {
+      border: none;
+      background: none;
+      padding: 10px 20px;
+      font-weight: 600;
+      color: #777;
+      border-bottom: 3px solid transparent;
+      transition: all 0.2s ease;
+    }
+    .mode-switch button.active {
+      color: #00a86b;
+      border-bottom: 3px solid #00a86b;
+    }
+  </style>
+		
+		<!--**********************************
+            Content body  start
+        ***********************************-->
+        <div class="content-body">
+			<div class="container-fluid">
+				<div class="card">
+                   
+					<div class="card-header d-sm-flex d-block">
+						<div class="mr-auto mb-sm-0 mb-3">
+							<h4 class="card-title mb-2">Tous les clients </h4>
+							<span class="ml-1" style="font-size: 12px;">Dernière mise à jour le {{maj}}</span>
+						</div>
+						<div class="input-group search-area right d-lg-inline-flex d-none">
+								<input type="text" class="form-control" placeholder="Rechercher un client">
+								<div class="input-group-append">
+									<span class="input-group-text">
+										<a href="javascript:void(0)">
+											<i class="flaticon-381-search-2"></i>
+										</a>
+									</span>
+								</div>
+							</div>
+						<a href="javascript:void(0);" class="btn btn-info light mr-3 ml-3"><i class="las la-filter mr-2"></i>Filtre</a>
+						<!-- <a href="javascript:void(0);" class="btn btn-info">+ Add Customer</a> -->
+                      <button type="button" class="btn btn-primary mb-2" data-toggle="modal" data-target="#md"><i class="fa fa-user-plus mr-2"></i>
+                            Ajouter un client 
+                        </button>
+                        <!-- modale  -->
+                         <div class="modal fade" id="md">
+                            <div class="modal-dialog modal-dialog-centered" style="max-width: 50vw; margin-right: 0;">
+                                <div class="modal-content">
+                                  <div class="modal-body">
+                                  	<button type="button" class="close" data-dismiss="modal"><span>&times;</span> </button> 
+      <form class="p-4 border rounded shadow-sm bg-white" action="{% url 'client' %}" method="post">
+        {% csrf_token %}
+        <input type="hidden" name="usr" value="{{usr}}">
+        <input type="hidden" name="com" value="{{com}}">
+        <!-- Type de client -->
+        <div class="form-row">
+    <div class="form-group col-md-6">
+      <label for="type" class="form-label">Type de client</label>
+          <select id="type" name="type" class="form-control default-select" required>
+            <option value="">-- Sélectionner un type --</option>
+            <option value="PP" {% if acteur.code == "PP" %} selected {% endif %}>Personne Physique</option>
+            <option value="PM" {% if acteur.code == "PM" %} selected {% endif %}>Personne Morale</option>
+            <option value="AO" {% if acteur.code == "AO" %} selected {% endif %}>Ambassade / Organisation Internationale</option>
+            <option value="ET" {% if acteur.code == "ET" %} selected {% endif %}>Entreprise Tiers</option>
+            <option value="OT" {% if acteur.code == "OT" %} selected {% endif %}>Autre</option>
+          </select>
+    </div>
+
+    <div class="form-group col-md-6">
+      <label for="name" class="form-label">Nom du client</label>
+      <input type="text" id="name" name="nom" class="form-control" placeholder="Ex: Jean Dupont" value="{{acteur.nom}}" required>
+    </div>
+  </div>
+
+        <!-- NIF -->
+        <div class="mb-3" id="nif-container">
+          <label for="nif" class="form-label">NIF</label>
+          <input type="text" id="nif" name="nif" class="form-control" placeholder="Numéro d'identification fiscale" value="{{acteur.nif}}">
+        </div>
+
+        <div class="form-row">
+          <div class="form-group col-md-6">
+          <label for="contact" class="form-label">Contact</label>
+          <input type="text" id="contact" name="tel" class="form-control" placeholder="Ex: +242 06 123 4567" value="{{acteur.num}}">
+          </div>
+
+          <div class="form-group col-md-6">
+            <label for="contact" class="form-label">Email</label>
+            <input type="text" id="contact" name="email" class="form-control" placeholder="Ex: salut@exemple.com" value="{{acteur.email}}">
+          </div>
+        </div>
+
+        <!-- Adresse -->
+        <div class="mb-3">
+          <label for="address" class="form-label">Adresse</label>
+          <input id="address" name="adresse" class="form-control" rows="2" placeholder="Ex: 12 Rue de la Paix, Brazzaville" value="{{acteur.adresse}}">
+        </div>
+
+        <!-- Ref Document (uniquement pour AO) -->
+        <div class="mb-3 d-none" id="ref-document-container">
+          <label for="ref_document" class="form-label">Référence du document</label>
+          <input type="text" id="ref_document" name="refdoc" class="form-control" placeholder="Ex: REF-12345" value="{{acteur.ref}}">
+        </div>
+
+        <div class="text-end">
+              <button type="submit" class="btn btn-primary px-4">AJOUTER</button>
+            </div>
+      </form>
+
+                                    </div>
+                                </div>
+                            </div>         
+                      </div>
+                       <script>
+    // Script pour gérer la logique dynamique selon le type
+    document.addEventListener("DOMContentLoaded", function() {
+      const typeSelect = document.getElementById("type");
+      const nifInput = document.getElementById("nif");
+      const refDocContainer = document.getElementById("ref-document-container");
+
+      typeSelect.addEventListener("change", function() {
+        const selected = this.value;
+
+        // Cas PP : NIF devient "-" automatiquement et non modifiable
+        if (selected === "PP") {
+          nifInput.value = "-";
+          nifInput.setAttribute("readonly", "readonly");
+          refDocContainer.classList.add("d-none");
+        }
+        // Cas AO : on affiche le champ ref_document
+        else if (selected === "AO") {
+          nifInput.removeAttribute("readonly");
+          nifInput.value = "";
+          refDocContainer.classList.remove("d-none");
+        }
+        // Autres cas : comportement normal
+        else {
+          nifInput.removeAttribute("readonly");
+          nifInput.value = "";
+          refDocContainer.classList.add("d-none");
+        }
+      });
+    });
+  </script>
+
+
+					</div>
+        </div>
+    {% block client %}
+      {% if nbr == 0 %}
+        <div class="card">			
+					<div class="card-body text-center">
+          <p>Aucun client trouvée</p>
+          </div>
+        </div>  
+      {% else %}
+        <div class="row">
+        {% for i in clients %}
+					<div class="col-xl-3 col-xxl-4 col-sm-6">
+						<div class="card user-card">
+							<div class="card-body pb-0">
+								<div class="d-flex mb-3 align-items-center">
+									<div class="dz-media mr-3">
+										<img src="{% static i.photo %}" alt="">
+									</div>
+									<div>
+										<h5 class="title"><a href="javascript:void(0);">{{i.nom}}</a></h5>
+										<span class="text-primary">{{i.type}}</span>
+									</div>
+								</div>
+								<p class="fs-12">{{i.adresse}}</p>
+								<ul class="list-group list-group-flush">
+									<li class="list-group-item">
+										<span class="mb-0 title">Email</span> :
+										<span class="text-black ml-2">{{i.email}}</span>
+									</li>
+									<li class="list-group-item">
+										<span class="mb-0 title">Téléphone</span> :
+										<span class="text-black ml-2">{{i.num}}</span>
+									</li>
+									<li class="list-group-item">
+										<span class="mb-0 title">NIF</span> :
+										<span class="text-black desc-text ml-2">{{i.nif}}</span>
+									</li>
+                  <li class="list-group-item">
+										<span class="mb-0 title">Référence</span> :
+										<span class="text-black desc-text ml-2">{{i.ref}}</span>
+									</li>
+								</ul>
+							</div>
+							<div class="card-footer d-flex">
+								<a href="#" class="btn btn-info shadow btn-xs sharp mr-1"><i class="fa fa-envelope-o"></i></a>
+                <a href="/modifier_client/?usr={{usr}}&com={{com}}&acteur={{i.uuid}}" class="btn btn-primary shadow btn-xs sharp mr-1"><i class="fa fa-pencil"></i></a>
+                <button type="button" class="btn btn-danger shadow btn-xs sharp" data-toggle="modal" data-target="#modal{{i.uuid}}"><i class="fa fa-trash"></i></button>
+												<!-- Modal -->
+                        <div class="modal fade" id="modal{{i.uuid}}">
+									        <div class="modal-dialog modal-dialog-centered" style="max-width: 50vw">
+									            <div class="modal-content">
+									                <div class="modal-header">
+									                  <h5 class="modal-title">Confirmation</h5>
+									                  <button type="button" class="close" data-dismiss="modal"><span>&times;</span> </button>
+									                </div>
+									                <div class="modal-body">
+                                    <p>Voulez-vous vraiment supprimer le client <strong>{{i.nom}}</strong> ? Cette action est irrersible et elle entrainera : <br><br> La suppression de tous ses stock, ce qui affectera toutes les statistiques financières.</p>
+                                  </div>
+                                  <div class="modal-footer">
+													          <form id="formArticle" action="{% url 'delete_client' %}" method="post">
+													            <div class="mb-3">
+													            	{% csrf_token %}
+													              <input type="hidden" name="usr" value="{{usr}}">
+													              <input type="hidden" name="com" value="{{com}}">
+													              <input type="hidden" name="acteur_id" value="{{i.uuid}}">
+													            </div>
+													            <div class="text-end">
+													              <button type="submit" class="btn btn-danger light px-4">Supprimer</button>
+													          </form>
+													            </div>
+													          		<button type="button" class="btn btn-primary px-4 mt-2" data-dismiss="modal">Annuler</button>
+									               </div>
+									           </div>
+									       </div>
+									     	</div>
+                  <a href="#" role="button" class="nav-link text-center ml-2 btn btn-xs px-2 py-1 light btn-success" data-toggle="dropdown">
+													<i class="las la-plus" ></i>
+												</a>
+												<div class="dropdown-menu dropdown-menu-right">
+                          <a href="/facturation/?usr={{usr}}&com={{com}}" class="dropdown-item ai-icon">
+                              <i class="flaticon-044-file text-info"></i>
+                              <span class="ml-2">Nouvelle facture </span>
+                          </a>
+                          <a href="#" class="dropdown-item ai-icon">
+                              <i class="flaticon-044-file text-info"></i>
+                              <span class="ml-2">Nouveau devis </span>
+                          </a>
+                          <form action="{% url 'client_fournisseur' %}" method="post">
+                          	{% csrf_token %}
+							              <input type="hidden" name="usr" value="{{usr}}">
+							              <input type="hidden" name="com" value="{{com}}">
+							              <input type="hidden" name="uuid" value="{{i.uuid}}">
+                          	<button type="submit" class="dropdown-item ai-icon">
+                              <svg id="icon-user1" xmlns="http://www.w3.org/2000/svg" class="text-primary" width="18" height="18" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                              <span class="ml-2">Copier comme fournisseur</span>
+                          	</button>
+							</div>
+						</div>
+					</div>
+        </div>
+        {% endfor %}
+				</div>
+      {% endif %}
+    {% endblock %}
+			</div>
+		</div>
+
+{% endblock %}

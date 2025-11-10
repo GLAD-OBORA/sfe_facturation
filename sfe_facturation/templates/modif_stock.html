@@ -1,0 +1,114 @@
+{% extends 'liste-stock.html' %}
+{% load static %}
+		
+
+{% block stock %}
+	<div class="card">			
+		<div class="card-body">
+			<div class="modal-header">
+				<a href="/stock/?usr={{usr}}&com={{com}}" class="close"><span>&times;</span> </a>
+			</div>
+    <div class="d-flex">
+			<div class="card-body">
+				<div class="text-center">
+					<div class="my-profile">
+						<img src="{% static stock.photo_article %}" alt="" class="rounded">
+					</div>
+					<h4 class="mt-3 font-w600 text-black mb-0 name-text">{{stock.article}}</h4>
+					<span>[{{stock.type_article}}]</span>
+					<p class="mb-0 mt-2">Dernière mise à jour le {{stock.maj_article}}</p>
+				</div>
+				<ul class="portofolio-social">
+					<li><a href="/detail_article/?usr={{usr}}&com={{com}}&article={{stock.id_article}}"><i class="fa fa-eye"></i></a></li>
+				</ul>
+			</div>
+      <div class="card-body">
+        <div class="text-center">
+          <div class="my-profile">
+            <img src="{% static stock.photo_fournisseur %}" alt="" class="rounded">
+          </div>
+      {% if stock.fournisseur == '' %}
+          <br>
+          <span class="mt-4 badge badge-danger light">Aucun fournisseur</span>
+        </div>
+      {% else %}
+          <h4 class="mt-3 font-w600 text-black mb-0 name-text">{{stock.fournisseur}}</h4>
+          <span>[{{stock.type_fournisseur}}]</span>
+          <p class="mb-0 mt-2">Dernière mise à jour le {{stock.date_fournisseur}}</p>
+        </div>
+        <ul class="portofolio-social">
+          <li><a href="/details_fournisseur/?usr={{usr}}&com={{com}}&acteur={{stock.id_fournisseur}}"><i class="fa fa-eye"></i></a></li>
+          <li><a href="#"><i class="fa fa-envelope-o"></i></a></li>
+        </ul>
+      {% endif %}
+      </div>
+    </div>
+
+				<div class="card">
+                                  
+                                    <div class="card-body">
+                                
+       
+          <form id="formArticle" action="{% url 'infos_stock' %}" method="post">
+            {% csrf_token %}
+            <input type="hidden" name="usr" value="{{usr}}">
+            <input type="hidden" name="com" value="{{com}}">
+            <input type="hidden" name="stock" value="{{stock.uuid}}">
+            <div class="form-row">
+              <div class="form-group col-md-6">
+                <label class="form-label">Article</label>
+                <select class="form-control default-select" id="type" name="article" required>
+                  <option value="">-- Sélectionner --</option>
+                {% for i in articles %}
+                  <option value="{{i.Uuid}}" {% if stock.article == i.Designation %} selected {% endif %}> {{i.Designation}} </option>
+                {% endfor %}
+                </select>
+              </div>
+
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Fournisseur</label>
+                <select class="form-control default-select" id="groupe" name="fournisseur">
+                  <option value="">-- Sélectionner --</option>
+                {% for i in fournisseurs %}
+                  <option value="{{i.Uuid}}" {% if stock.fournisseur == i.Designation %} selected {% endif %}> {{i.Designation}} </option>
+                {% endfor %}
+                </select>
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">Devise</label>
+              <select name="devise" class="form-control default-select" id="devise" required>
+                  <option>USD</option>
+                  <option>CDF</option>
+              </select>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Prix unitaire d'achat</label>
+                <input type="number" name="prix" class="form-control" id="prixTTC" placeholder="0.00" value="{{stock.prix}}" required>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Quantité</label>
+                <input type="number" name="quantite" class="form-control" id="prixHT" placeholder="0.00" value="{{stock.quantite}}" required>
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">Montant total</label>
+              <input type="number" name="total" class="form-control" id="designation" placeholder="0.00" readonly>
+            </div>
+
+            <div class="text-end">
+              <button type="submit" class="btn btn-primary px-4">Valider</button>
+            </div>
+          </form>
+
+                                    </div>
+                                </div>
+
+		</div>
+	</div>
+
+{% endblock %}

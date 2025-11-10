@@ -1,0 +1,687 @@
+{% extends 'liste-article.html' %}
+{% load static %}
+		
+
+{% block article %}
+<div class="row">
+					<div class="col-xl-9 col-xxl-8">
+						<div class="row">
+							<div class="col-xl-8 col-xxl-12">
+								<div class="card">
+									<div class="card-header pb-2 d-block d-sm-flex flex-wrap border-0">
+										<div class="mb-3">
+											<h4 class="fs-20 text-black">Historique factures</h4>
+											<p class="mb-0 fs-13">Dernière mise à jour le {{article.maj}}</p>
+										</div>
+										<div class="card-action card-tabs mb-3 style-1">
+											<ul class="nav nav-tabs" role="tablist">
+												<li class="nav-item">
+													<a class="nav-link active" data-toggle="tab" href="#toutes">
+														Toutes	
+													</a>
+												</li>
+												<li class="nav-item">
+													<a class="nav-link" data-toggle="tab" href="#soldes">
+														Soldes
+													</a>
+												</li>
+												<li class="nav-item">
+													<a class="nav-link" data-toggle="tab" href="#autres">
+														Autres
+													</a>
+												</li>
+											</ul>
+										</div>
+									</div>
+									<div class="card-body tab-content p-0">
+										<div class="tab-pane active show fade" id="toutes">
+											<div class="text-center">
+												<span class="text-primary">Toutes les factures</span>
+											</div>
+											<div class="table-responsive">
+												<table class="table table-hover table-responsive-sm">
+													<tbody>
+														<tr>
+															<td><span class="ml-2">NUMERO</span></td>
+															<td><span>DATE</span></td>
+															<td><span style="text-transform: uppercase;">{{article.nom}}</span></td>
+															<td><span>FACTURE</span></td>
+															<td><span>STATUT</span></td>
+														</tr>
+													{% for i in article_facture %}
+														<tr>
+															<td>
+																<span class="text-black ml-2">{{i.rn}}</span>
+															</td>
+															<td>
+																<span class="text-black">{{i.date}}</span>
+															</td>
+															<td>
+																<span class="text-black">[{{i.nombre}}]{{i.quantite}}{{i.devise}}</span>
+															</td>
+															<td>
+																<span class="text-black">{{i.montant}}{{i.devise}}</span>
+															</td>
+															<td>
+															{% if i.statut == 'Null' %}
+																<span class="badge badge-danger light mb-0">{{i.statut}}</span></td>
+															{% elif i.statut == 'Acompte' %}
+																<span class="badge badge-light mb-0">{{i.statut}}</span></td>
+															{% else %}
+																<span class="badge badge-success light mb-0">{{i.statut}}</span></td>
+															{% endif %}
+														</tr>
+													{% endfor %}
+													</tbody>
+												</table>
+											</div>
+										</div>
+										<div class="tab-pane active show fade" id="soldes">
+											<div class="text-center">
+												<span class="text-primary">Factures soldées</span>
+											</div>
+											<div class="table-responsive">
+												<table class="table table-hover table-responsive-sm">
+													<tbody>
+														<tr>
+															<td><span class="ml-2">NUMERO</span></td>
+															<td><span>DATE</span></td>
+															<td><span style="text-transform: uppercase;">{{article.nom}}</span></td>
+															<td><span>FACTURE</span></td>
+															<td><span>STATUT</span></td>
+														</tr>
+												{% for i in article_facture %}
+													{% if i.statut == 'Solde' %}
+														<tr>
+															<td>
+																<span class="text-black ml-2">{{i.rn}}</span>
+															</td>
+															<td>
+																<span class="text-black">{{i.date}}</span>
+															</td>
+															<td>
+																<span class="text-black">[{{i.nombre}}]{{i.quantite}}{{i.devise}}</span>
+															</td>
+															<td>
+																<span class="text-black">{{i.montant}}{{i.devise}}</span>
+															</td>
+															<td>
+																<span class="badge badge-success light mb-0">{{i.statut}}</span>
+															</td>
+														</tr>
+													{% endif %}
+												{% endfor %}
+													</tbody>
+												</table>
+											</div>
+										</div>
+										<div class="tab-pane fade" id="autres">
+											<div class="text-center">
+												<span class="text-primary">Factures impayées/accomptées</span>
+											</div>
+											<div class="table-responsive">
+												<table class="table table-hover table-responsive-sm">
+													<tbody>
+														<tr>
+															<td><span class="ml-2">NUMERO</span></td>
+															<td><span>DATE</span></td>
+															<td><span style="text-transform: uppercase;">{{article.nom}}</span></td>
+															<td><span>FACTURE</span></td>
+															<td><span>STATUT</span></td>
+														</tr>
+												{% for i in article_facture %}
+													{% if i.statut == 'Acompte' or i.statut == 'Null' %}
+														<tr>
+															<td>
+																<span class="text-black ml-2">{{i.rn}}</span>
+															</td>
+															<td>
+																<span class="text-black">{{i.date}}</span>
+															</td>
+															<td>
+																<span class="text-black">[{{i.nombre}}]{{i.quantite}}{{i.devise}}</span>
+															</td>
+															<td>
+																<span class="text-black">{{i.montant}}{{i.devise}}</span>
+															</td>
+															<td>
+															{% if i.statut == 'Null' %}
+																<span class="badge badge-danger light mb-0">{{i.statut}}</span></td>
+															{% elif i.statut == 'Acompte' %}
+																<span class="badge badge-light mb-0">{{i.statut}}</span></td>
+															{% endif %}
+															</td>
+														</tr>
+													{% endif %}
+												{% endfor %}
+													</tbody>
+												</table>
+											</div>
+										</div>
+									</div>
+								</div>	
+							</div>
+									<div class="col-xl-8 col-xxl-12">
+										<div class="card">
+											<div class="card-header pb-2 d-block d-sm-flex flex-wrap border-0">
+												<div class="mb-3">
+													<h4 class="fs-20 text-black">Historique entrées</h4>
+													<p class="mb-0 fs-13">Dernière mise à jour le {{article.last_stock}}</p>
+												</div>
+											</div>
+				                    		<div class="card-body">
+												<div class="table-responsive">
+													<table class="table text-center bg-primary-hover tr-rounded order-tbl" id="ListDatatableView">
+														<thead>
+															<tr>
+																<th class="text-left">Date</th>
+																<th class="text-left">Fournisseur</th>
+																<th class="text-center">Prix</th>
+																<th class="text-center">Quantité</th>
+																<th class="text-center">Total</th>
+															</tr>
+														</thead>
+														<tbody>
+														{% for i in stock %}
+															<tr>
+																<td class="text-left"><a href="/details_stock/?usr={{usr}}&com={{com}}&stock={{i.uuid}}">{{i.date}}</a></td>
+															{% if i.fournisseur == '' %}
+																<td><span class="badge badge-danger light mb-0">Aucun</span></td>
+															{% else %}
+																<td class="text-left">{{i.fournisseur}}</td>
+															{% endif %}
+																<td class="text-left">{{i.prix}} {{i.devise}}</td>
+																<td class="text-center">{{i.quantite}}</td>
+																<td class="text-center">{{i.total}} {{i.devise}}</td>
+															</tr>
+														{% endfor %}
+														</tbody>
+													</table>
+												</div>
+											</div>
+										</div>
+									</div>
+							<div class="col-xl-12">
+								<div class="card">
+									<div class="card-header border-0">
+										<h4 class="mb-0 text-black fs-20">Graphique générale [{{entreprise.Devise}}]</h4>
+									</div>
+									<div class="card-body text-center">
+										<div class="w-100 h-100">
+											<canvas id="pie" class="d-inline-block"></canvas>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="col-xl-12">
+								<div class="card">
+									<div class="card-header pb-2 d-block d-sm-flex flex-wrap border-0">
+										<div class="mb-3">
+											<h4 class="fs-20 text-black">Statistiques hebdomadaires [{{entreprise.Devise}}]</h4>
+											<p class="mb-0 fs-13">Des 7 derniers jours</p>
+										</div>
+									</div>
+									<div class="card-body">
+										<div class="bg-primary coin-holding flex-wrap">
+											<div class="mb-2 coin-bx">
+												<div class="d-flex align-items-center">
+													<div>
+														<svg width="50" height="50" viewbox="0 0 63 63" fill="none" xmlns="http://www.w3.org/2000/svg">
+															<path d="M30.5437 0.00501883C13.9681 -0.294993 0.305031 12.893 0.00501883 29.4562C-0.294993 46.0194 12.893 59.6949 29.4562 59.9949C46.0194 60.2949 59.6949 47.1069 59.9949 30.5312C60.2949 13.9681 47.1069 0.29253 30.5437 0.00501883ZM29.5562 54.3697C16.1182 54.1197 5.38023 42.9942 5.63024 29.5562C5.86775 16.1182 16.9932 5.38023 30.4312 5.61774C43.8818 5.86775 54.6072 16.9932 54.3697 30.4312C54.1322 43.8693 42.9942 54.6072 29.5562 54.3697Z" fill="white"></path>
+														{% if stat_stock.1 >= 0 %}
+															<path d="M25.4813 24.6343L25.4813 24.6343L30.3544 19.7376C30.3571 19.7348 30.3596 19.7323 30.3619 19.7301M25.4813 24.6343L30.7116 20.0875L30.3587 19.7333C30.368 19.7241 30.3756 19.7172 30.3789 19.7143L30.38 19.7133C30.3775 19.7155 30.3709 19.7214 30.3627 19.7293C30.3625 19.7295 30.3622 19.7298 30.3619 19.7301M25.4813 24.6343C24.9214 25.197 24.9234 26.1071 25.4862 26.6672C26.0489 27.2273 26.9591 27.2251 27.5191 26.6624L27.5192 26.6624L29.9377 24.232M25.4813 24.6343L29.9377 24.232M30.3619 19.7301C30.9212 19.1741 31.8279 19.1724 32.389 19.7304C32.3902 19.7316 32.3914 19.7329 32.3927 19.7341L32.3941 19.7356L32.4062 19.7477L37.2691 24.6342L36.9147 24.9869L37.2692 24.6342C37.829 25.1968 37.8271 26.107 37.2642 26.6672C36.7015 27.2272 35.7914 27.225 35.2314 26.6623L35.2313 26.6623L32.8127 24.232L32.8127 42.875C32.8127 43.6689 32.1692 44.3125 31.3752 44.3125C30.5813 44.3125 29.9377 43.6689 29.9377 42.875L29.9377 24.232M30.3619 19.7301C30.3605 19.7315 30.3591 19.7329 30.3577 19.7343L29.9377 24.232M32.3927 19.7342C32.3932 19.7347 32.3937 19.7351 32.3941 19.7356L32.3927 19.7342Z" fill="white" stroke="white"></path>
+														{% else %}
+															<path d="M37.2692 38.9908L37.2692 38.9908L32.3961 43.8874C32.3934 43.8902 32.3909 43.8927 32.3885 43.895M37.2692 38.9908L32.0389 43.5375L32.3918 43.8917C32.3825 43.9009 32.3749 43.9078 32.3716 43.9107L32.3705 43.9117C32.373 43.9095 32.3796 43.9036 32.3877 43.8957C32.388 43.8955 32.3883 43.8952 32.3885 43.895M37.2692 38.9908C37.8291 38.4281 37.827 37.5179 37.2643 36.9578C36.7016 36.3978 35.7914 36.3999 35.2314 36.9626L35.2313 36.9627L32.8127 39.393M37.2692 38.9908L32.8127 39.393M32.3885 43.895C31.8292 44.4509 30.9226 44.4526 30.3615 43.8946C30.3603 43.8934 30.3591 43.8922 30.3578 43.8909L30.3563 43.8894L30.3442 43.8773L25.4813 38.9908L25.8357 38.6381L25.4813 38.9908C24.9215 38.4282 24.9234 37.518 25.4862 36.9578C26.049 36.3978 26.9591 36.4 27.5191 36.9627L27.5192 36.9627L29.9377 39.393L29.9377 20.75C29.9377 19.9561 30.5813 19.3125 31.3752 19.3125C32.1692 19.3125 32.8127 19.9561 32.8127 20.75L32.8127 39.393M32.3885 43.895C32.39 43.8935 32.3914 43.8921 32.3928 43.8907L32.8127 39.393M30.3577 43.8908C30.3573 43.8903 30.3568 43.8899 30.3564 43.8894L30.3577 43.8908Z" fill="white" stroke="white"></path>
+														{% endif %}
+														</svg>
+													</div>
+													<div class="ml-3">
+														<h4 class="coin-font font-w600 mb-0 text-white">Stock</h4>
+														<p class="mb-0 text-white op-6">Entrées</p>
+													</div>
+												</div>
+											</div>
+											<div class="mb-2">
+												<div class="d-flex align-items-center">
+													<div class="coin-bx-one">
+														<svg width="33" height="35" viewbox="0 0 33 35" fill="none" xmlns="http://www.w3.org/2000/svg">
+															<rect width="4.71425" height="34.5712" rx="2.35713" transform="matrix(-1 0 0 1 33 0)" fill="white"></rect>
+															<rect width="4.71425" height="25.1427" rx="2.35713" transform="matrix(-1 0 0 1 23.5713 9.42853)" fill="white"></rect>
+															<rect width="4.71425" height="10.9999" rx="2.35713" transform="matrix(-1 0 0 1 14.1436 23.5713)" fill="white"></rect>
+															<rect width="5.31864" height="21.2746" rx="2.65932" transform="matrix(-1 0 0 1 5.31836 13.2966)" fill="white"></rect>
+														</svg>
+													</div>	
+													<div class="ml-3">
+														<h2 class="mb-0 text-white coin-font-1">{{stat_stock.0}}{{entreprise.Devise}}</h2>
+													</div>
+												</div>
+											</div>
+											<div class="mb-2">
+												<div class="d-flex align-items-center">
+												{% if stat_stock.1 >= 0 %}
+													<svg width="21" height="14" viewbox="0 0 21 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+														<path d="M1 13C1.91797 11.9157 4.89728 8.72772 6.5 7L12.5 10L19.5 1" stroke="#2BC155" stroke-width="2" stroke-linecap="round"></path>
+													</svg>
+													<p class="mb-0 ml-2 text-success">{{stat_stock.1}}%</p>
+													<p class="mb-0 ml-2 font-w400 text-white">Cette semaine</p>	
+												{% else %}
+													<svg width="29" height="22" viewbox="0 0 29 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+														<g filter="url(#filter0_d)">
+														<path d="M5 4C5.91797 5.08433 8.89728 8.27228 10.5 10L16.5 7L23.5 16" stroke="#FF2E2E" stroke-width="2" stroke-linecap="round"></path>
+														</g>
+														<defs>
+														<filter id="filter0_d" x="0" y="0" width="28.5001" height="22.0001" filterunits="userSpaceOnUse" color-interpolation-filters="sRGB">
+														<feflood flood-opacity="0" result="BackgroundImageFix"></feflood>
+														<fecolormatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"></fecolormatrix>
+														<feoffset dy="1"></feoffset>
+														<fegaussianblur stddeviation="2"></fegaussianblur>
+														<fecolormatrix type="matrix" values="0 0 0 0 1 0 0 0 0 0.180392 0 0 0 0 0.180392 0 0 0 0.61 0"></fecolormatrix>
+														<feblend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow"></feblend>
+														<feblend mode="normal" in="SourceGraphic" in2="effect1_dropShadow" result="shape"></feblend>
+														</filter>
+														</defs>
+													</svg>
+
+													<p class="mb-0 ml-2 text-danger">{{stat_stock.1}}%</p>
+													<p class="mb-0 ml-2 font-w400 text-white">Cette semaine</p>
+												{% endif %}
+												</div>
+											</div>
+										</div>
+										<div class="bg-success coin-holding mt-4 flex-wrap">
+											<div class="mb-2 coin-bx">
+												<div class="d-flex align-items-center">
+													<div>
+														<svg width="50" height="50" viewbox="0 0 63 63" fill="none" xmlns="http://www.w3.org/2000/svg">
+															<path d="M30.5437 0.00501883C13.9681 -0.294993 0.305031 12.893 0.00501883 29.4562C-0.294993 46.0194 12.893 59.6949 29.4562 59.9949C46.0194 60.2949 59.6949 47.1069 59.9949 30.5312C60.2949 13.9681 47.1069 0.29253 30.5437 0.00501883ZM29.5562 54.3697C16.1182 54.1197 5.38023 42.9942 5.63024 29.5562C5.86775 16.1182 16.9932 5.38023 30.4312 5.61774C43.8818 5.86775 54.6072 16.9932 54.3697 30.4312C54.1322 43.8693 42.9942 54.6072 29.5562 54.3697Z" fill="white"></path>
+														{% if stat_facture.1 >= 0 %}
+															<path d="M25.4813 24.6343L25.4813 24.6343L30.3544 19.7376C30.3571 19.7348 30.3596 19.7323 30.3619 19.7301M25.4813 24.6343L30.7116 20.0875L30.3587 19.7333C30.368 19.7241 30.3756 19.7172 30.3789 19.7143L30.38 19.7133C30.3775 19.7155 30.3709 19.7214 30.3627 19.7293C30.3625 19.7295 30.3622 19.7298 30.3619 19.7301M25.4813 24.6343C24.9214 25.197 24.9234 26.1071 25.4862 26.6672C26.0489 27.2273 26.9591 27.2251 27.5191 26.6624L27.5192 26.6624L29.9377 24.232M25.4813 24.6343L29.9377 24.232M30.3619 19.7301C30.9212 19.1741 31.8279 19.1724 32.389 19.7304C32.3902 19.7316 32.3914 19.7329 32.3927 19.7341L32.3941 19.7356L32.4062 19.7477L37.2691 24.6342L36.9147 24.9869L37.2692 24.6342C37.829 25.1968 37.8271 26.107 37.2642 26.6672C36.7015 27.2272 35.7914 27.225 35.2314 26.6623L35.2313 26.6623L32.8127 24.232L32.8127 42.875C32.8127 43.6689 32.1692 44.3125 31.3752 44.3125C30.5813 44.3125 29.9377 43.6689 29.9377 42.875L29.9377 24.232M30.3619 19.7301C30.3605 19.7315 30.3591 19.7329 30.3577 19.7343L29.9377 24.232M32.3927 19.7342C32.3932 19.7347 32.3937 19.7351 32.3941 19.7356L32.3927 19.7342Z" fill="white" stroke="white"></path>
+														{% else %}
+															<path d="M37.2692 38.9908L37.2692 38.9908L32.3961 43.8874C32.3934 43.8902 32.3909 43.8927 32.3885 43.895M37.2692 38.9908L32.0389 43.5375L32.3918 43.8917C32.3825 43.9009 32.3749 43.9078 32.3716 43.9107L32.3705 43.9117C32.373 43.9095 32.3796 43.9036 32.3877 43.8957C32.388 43.8955 32.3883 43.8952 32.3885 43.895M37.2692 38.9908C37.8291 38.4281 37.827 37.5179 37.2643 36.9578C36.7016 36.3978 35.7914 36.3999 35.2314 36.9626L35.2313 36.9627L32.8127 39.393M37.2692 38.9908L32.8127 39.393M32.3885 43.895C31.8292 44.4509 30.9226 44.4526 30.3615 43.8946C30.3603 43.8934 30.3591 43.8922 30.3578 43.8909L30.3563 43.8894L30.3442 43.8773L25.4813 38.9908L25.8357 38.6381L25.4813 38.9908C24.9215 38.4282 24.9234 37.518 25.4862 36.9578C26.049 36.3978 26.9591 36.4 27.5191 36.9627L27.5192 36.9627L29.9377 39.393L29.9377 20.75C29.9377 19.9561 30.5813 19.3125 31.3752 19.3125C32.1692 19.3125 32.8127 19.9561 32.8127 20.75L32.8127 39.393M32.3885 43.895C32.39 43.8935 32.3914 43.8921 32.3928 43.8907L32.8127 39.393M30.3577 43.8908C30.3573 43.8903 30.3568 43.8899 30.3564 43.8894L30.3577 43.8908Z" fill="white" stroke="white"></path>
+														{% endif %}
+														</svg>
+													</div>
+													<div class="ml-3">
+														<h4 class="coin-font font-w600 mb-0 text-white">Factures</h4>
+														<p class="mb-0 text-white op-6">Toutes</p>
+													</div>
+												</div>
+											</div>
+											<div class="mb-2">
+												<div class="d-flex align-items-center">
+													<div class="coin-bx-one">
+														<svg width="33" height="35" viewbox="0 0 33 35" fill="none" xmlns="http://www.w3.org/2000/svg">
+															<rect width="4.71425" height="34.5712" rx="2.35713" transform="matrix(-1 0 0 1 33 0)" fill="white"></rect>
+															<rect width="4.71425" height="25.1427" rx="2.35713" transform="matrix(-1 0 0 1 23.5713 9.42853)" fill="white"></rect>
+															<rect width="4.71425" height="10.9999" rx="2.35713" transform="matrix(-1 0 0 1 14.1436 23.5713)" fill="white"></rect>
+															<rect width="5.31864" height="21.2746" rx="2.65932" transform="matrix(-1 0 0 1 5.31836 13.2966)" fill="white"></rect>
+														</svg>
+													</div>	
+													<div class="ml-3">
+														<h2 class="mb-0 text-white coin-font-1">{{stat_facture.0}}{{entreprise.Devise}}</h2>
+													</div>
+												</div>
+											</div>
+											<div class="mb-2">
+												<div class="d-flex align-items-center">
+												{% if stat_facture.1 >= 0 %}
+													<svg width="21" height="14" viewbox="0 0 21 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+														<path d="M1 13C1.91797 11.9157 4.89728 8.72772 6.5 7L12.5 10L19.5 1" stroke="#2BC155" stroke-width="2" stroke-linecap="round"></path>
+													</svg>
+													<p class="mb-0 ml-2 text-success">{{stat_facture.1}}%</p>
+													<p class="mb-0 ml-2 font-w400 text-white">Cette semaine</p>	
+												{% else %}
+													<svg width="29" height="22" viewbox="0 0 29 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+														<g filter="url(#filter0_d)">
+														<path d="M5 4C5.91797 5.08433 8.89728 8.27228 10.5 10L16.5 7L23.5 16" stroke="#FF2E2E" stroke-width="2" stroke-linecap="round"></path>
+														</g>
+														<defs>
+														<filter id="filter0_d" x="0" y="0" width="28.5001" height="22.0001" filterunits="userSpaceOnUse" color-interpolation-filters="sRGB">
+														<feflood flood-opacity="0" result="BackgroundImageFix"></feflood>
+														<fecolormatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"></fecolormatrix>
+														<feoffset dy="1"></feoffset>
+														<fegaussianblur stddeviation="2"></fegaussianblur>
+														<fecolormatrix type="matrix" values="0 0 0 0 1 0 0 0 0 0.180392 0 0 0 0 0.180392 0 0 0 0.61 0"></fecolormatrix>
+														<feblend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow"></feblend>
+														<feblend mode="normal" in="SourceGraphic" in2="effect1_dropShadow" result="shape"></feblend>
+														</filter>
+														</defs>
+													</svg>
+
+													<p class="mb-0 ml-2 text-danger">{{stat_facture.1}}%</p>
+													<p class="mb-0 ml-2 font-w400 text-white">Cette semaine</p>
+												{% endif %}
+												</div>
+											</div>
+										</div>
+										<div class="bg-info coin-holding mt-4 flex-wrap">
+											<div class="mb-2 coin-bx">
+												<div class="d-flex align-items-center">
+													<div>
+														<svg width="50" height="50" viewbox="0 0 63 63" fill="none" xmlns="http://www.w3.org/2000/svg">
+															<path d="M30.5437 0.00501883C13.9681 -0.294993 0.305031 12.893 0.00501883 29.4562C-0.294993 46.0194 12.893 59.6949 29.4562 59.9949C46.0194 60.2949 59.6949 47.1069 59.9949 30.5312C60.2949 13.9681 47.1069 0.29253 30.5437 0.00501883ZM29.5562 54.3697C16.1182 54.1197 5.38023 42.9942 5.63024 29.5562C5.86775 16.1182 16.9932 5.38023 30.4312 5.61774C43.8818 5.86775 54.6072 16.9932 54.3697 30.4312C54.1322 43.8693 42.9942 54.6072 29.5562 54.3697Z" fill="white"></path>
+														{% if stat_paiement.1 >= 0 %}
+															<path d="M25.4813 24.6343L25.4813 24.6343L30.3544 19.7376C30.3571 19.7348 30.3596 19.7323 30.3619 19.7301M25.4813 24.6343L30.7116 20.0875L30.3587 19.7333C30.368 19.7241 30.3756 19.7172 30.3789 19.7143L30.38 19.7133C30.3775 19.7155 30.3709 19.7214 30.3627 19.7293C30.3625 19.7295 30.3622 19.7298 30.3619 19.7301M25.4813 24.6343C24.9214 25.197 24.9234 26.1071 25.4862 26.6672C26.0489 27.2273 26.9591 27.2251 27.5191 26.6624L27.5192 26.6624L29.9377 24.232M25.4813 24.6343L29.9377 24.232M30.3619 19.7301C30.9212 19.1741 31.8279 19.1724 32.389 19.7304C32.3902 19.7316 32.3914 19.7329 32.3927 19.7341L32.3941 19.7356L32.4062 19.7477L37.2691 24.6342L36.9147 24.9869L37.2692 24.6342C37.829 25.1968 37.8271 26.107 37.2642 26.6672C36.7015 27.2272 35.7914 27.225 35.2314 26.6623L35.2313 26.6623L32.8127 24.232L32.8127 42.875C32.8127 43.6689 32.1692 44.3125 31.3752 44.3125C30.5813 44.3125 29.9377 43.6689 29.9377 42.875L29.9377 24.232M30.3619 19.7301C30.3605 19.7315 30.3591 19.7329 30.3577 19.7343L29.9377 24.232M32.3927 19.7342C32.3932 19.7347 32.3937 19.7351 32.3941 19.7356L32.3927 19.7342Z" fill="white" stroke="white"></path>
+														{% else %}
+															<path d="M37.2692 38.9908L37.2692 38.9908L32.3961 43.8874C32.3934 43.8902 32.3909 43.8927 32.3885 43.895M37.2692 38.9908L32.0389 43.5375L32.3918 43.8917C32.3825 43.9009 32.3749 43.9078 32.3716 43.9107L32.3705 43.9117C32.373 43.9095 32.3796 43.9036 32.3877 43.8957C32.388 43.8955 32.3883 43.8952 32.3885 43.895M37.2692 38.9908C37.8291 38.4281 37.827 37.5179 37.2643 36.9578C36.7016 36.3978 35.7914 36.3999 35.2314 36.9626L35.2313 36.9627L32.8127 39.393M37.2692 38.9908L32.8127 39.393M32.3885 43.895C31.8292 44.4509 30.9226 44.4526 30.3615 43.8946C30.3603 43.8934 30.3591 43.8922 30.3578 43.8909L30.3563 43.8894L30.3442 43.8773L25.4813 38.9908L25.8357 38.6381L25.4813 38.9908C24.9215 38.4282 24.9234 37.518 25.4862 36.9578C26.049 36.3978 26.9591 36.4 27.5191 36.9627L27.5192 36.9627L29.9377 39.393L29.9377 20.75C29.9377 19.9561 30.5813 19.3125 31.3752 19.3125C32.1692 19.3125 32.8127 19.9561 32.8127 20.75L32.8127 39.393M32.3885 43.895C32.39 43.8935 32.3914 43.8921 32.3928 43.8907L32.8127 39.393M30.3577 43.8908C30.3573 43.8903 30.3568 43.8899 30.3564 43.8894L30.3577 43.8908Z" fill="white" stroke="white"></path>
+														{% endif %}
+														</svg>
+													</div>
+													<div class="ml-3">
+														<h4 class="coin-font font-w600 mb-0 text-white">Paiements</h4>
+														<p class="mb-0 text-white op-6">Estimations</p>
+													</div>
+												</div>
+											</div>
+											<div class="mb-2">
+												<div class="d-flex align-items-center">
+													<div class="coin-bx-one">
+														<svg width="33" height="35" viewbox="0 0 33 35" fill="none" xmlns="http://www.w3.org/2000/svg">
+															<rect width="4.71425" height="34.5712" rx="2.35713" transform="matrix(-1 0 0 1 33 0)" fill="white"></rect>
+															<rect width="4.71425" height="25.1427" rx="2.35713" transform="matrix(-1 0 0 1 23.5713 9.42853)" fill="white"></rect>
+															<rect width="4.71425" height="10.9999" rx="2.35713" transform="matrix(-1 0 0 1 14.1436 23.5713)" fill="white"></rect>
+															<rect width="5.31864" height="21.2746" rx="2.65932" transform="matrix(-1 0 0 1 5.31836 13.2966)" fill="white"></rect>
+														</svg>
+													</div>	
+													<div class="ml-3">
+														<h2 class="mb-0 text-white coin-font-1">{{stat_paiement.0}}{{entreprise.Devise}}</h2>
+													</div>
+												</div>
+											</div>
+											<div class="mb-2">
+												<div class="d-flex align-items-center">
+												{% if stat_stock.1 >= 0 %}
+													<svg width="21" height="14" viewbox="0 0 21 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+														<path d="M1 13C1.91797 11.9157 4.89728 8.72772 6.5 7L12.5 10L19.5 1" stroke="#2BC155" stroke-width="2" stroke-linecap="round"></path>
+													</svg>
+													<p class="mb-0 ml-2 text-success">{{stat_paiement.1}}%</p>
+													<p class="mb-0 ml-2 font-w400 text-white">Cette semaine</p>	
+												{% else %}
+													<svg width="29" height="22" viewbox="0 0 29 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+														<g filter="url(#filter0_d)">
+														<path d="M5 4C5.91797 5.08433 8.89728 8.27228 10.5 10L16.5 7L23.5 16" stroke="#FF2E2E" stroke-width="2" stroke-linecap="round"></path>
+														</g>
+														<defs>
+														<filter id="filter0_d" x="0" y="0" width="28.5001" height="22.0001" filterunits="userSpaceOnUse" color-interpolation-filters="sRGB">
+														<feflood flood-opacity="0" result="BackgroundImageFix"></feflood>
+														<fecolormatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"></fecolormatrix>
+														<feoffset dy="1"></feoffset>
+														<fegaussianblur stddeviation="2"></fegaussianblur>
+														<fecolormatrix type="matrix" values="0 0 0 0 1 0 0 0 0 0.180392 0 0 0 0 0.180392 0 0 0 0.61 0"></fecolormatrix>
+														<feblend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow"></feblend>
+														<feblend mode="normal" in="SourceGraphic" in2="effect1_dropShadow" result="shape"></feblend>
+														</filter>
+														</defs>
+													</svg>
+
+													<p class="mb-0 ml-2 text-danger">{{stat_paiement.1}}%</p>
+													<p class="mb-0 ml-2 font-w400 text-white">Cette semaine</p>
+												{% endif %}
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="col-xl-4 col-xxl-12">
+								<div class="row">
+									<div class="col-xl-12 m-t25">
+										<div class="card">
+											<div class="card-header pb-2 d-block d-sm-flex flex-wrap border-0">
+												<div class="mb-3">
+													<h4 class="fs-20 text-black">Statistiques mensuelles [{{entreprise.Devise}}]</h4>
+													<p class="mb-0 fs-13">Des 5 derniers mois</p>
+												</div>
+											</div>
+											<div class="card-body pb-0 px-2">
+												<canvas id="bar" class="d-inline-block"></canvas>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="col-xl-4 col-xxl-12">
+								<div class="card">
+									<div class="card-header pb-0 d-block d-sm-flex flex-wrap border-0 align-items-center">
+										<div class="mr-auto mb-3">
+											<h4 class="fs-20 text-black">Coin Chart</h4>
+											<p class="mb-0 fs-12">Lorem ipsum dolor sit amet, consectetur</p>
+										</div>
+										<div class="input-group detault-daterange mr-3  mb-3">
+											<span class="input-group-text"><i class="las la-calendar"></i></span>
+											<input type="text" class="form-control input-daterange-timepicker" name="daterange" value="04/01/2015" readonly>
+										</div>
+									</div>
+									<div class="card-body pb-0 pt-sm-3 pt-0">
+										<div class="mr-auto mb-3 mt-2 mb-3">
+											<p class="fs-18 mb-1">Price</p>
+											<h2 class="fs-28 font-w600 text-black">$11,898.15</h2>
+										</div>
+										<div class="row sp20 mb-4 align-items-center">
+											<div class="col-lg-4 col-xxl-4 col-sm-4 d-flex flex-wrap align-items-center">
+												<div class="px-2 info-group">
+													<p class="fs-18 mb-1">Price</p>
+													<h2 class="fs-28 font-w600 text-black">$11,898.15</h2>
+												</div>
+											</div>
+											<div class="d-flex col-lg-8 col-xxl-8 co-sm-8 align-items-center mt-sm-0 mt-3 justify-content-end">
+												<div class="px-2 info-group">
+													<p class="fs-14 mb-1">24h% change</p>
+													<h3 class="fs-20 font-w600"><span class="text-success">1.64%</span>
+													<svg width="14" height="14" viewbox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+													<path d="M0 7L7.00001 -8.77983e-06L14 7H7.00001H0Z" fill="#2BC155"></path>
+													</svg>
+													</h3>
+												</div>
+												<div class="px-2 info-group">
+													<p class="fs-14 mb-1">Volume (24h)</p>
+													<h3 class="fs-20 font-w600 text-black">$47.22B</h3>
+												</div>
+												<div class="px-2 info-group">
+													<p class="fs-14 mb-1">Market Cap</p>
+													<h3 class="fs-20 font-w600 text-black">$219.24B</h3>
+												</div>
+											</div>
+										</div>
+									</div>
+									<div class="card-body pb-2 px-3">
+										<div id="marketChart" class="market-line"></div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="col-xl-3 col-xxl-4">
+						<div class="row">
+							<div class="col-xl-12 col-lg-6 col-sm-6">
+								<div class="card">
+									<div class="card-body">
+										<div class="text-center">
+											<div class="my-profile">
+												<img src="{% static article.photo %}" alt="" class="rounded">
+											</div>
+											<h4 class="mt-3 font-w600 text-black mb-0 name-text">{{article.nom}}</h4>
+											<span>[{{article.type}}]</span>
+											<p class="mb-0 mt-2">Mise à jour le {{article.date}}</p>
+										</div>
+										<ul class="portofolio-social">
+											<li><a href="/modifier_article/?usr={{usr}}&com={{com}}&article={{article.uuid}}"><i class="fa fa-pencil"></i></a></li>
+											<li><a href="#" role="button" data-toggle="modal" data-target="#modalConfirm"><i class="fa fa-trash"></i></a>
+							<div class="modal fade" id="modalConfirm">
+									          <div class="modal-dialog modal-dialog-centered" style="max-width: 50vw">
+									              <div class="modal-content">
+									                <div class="modal-header">
+									                  <h5 class="modal-title">Confirmation</h5>
+									                  <button type="button" class="close" data-dismiss="modal"><span>&times;</span> </button>
+									                </div>
+									                <div class="modal-body">
+                                    <p>Voulez-vous vraiment supprimer l'article <strong>{{article.nom}}</strong> ? Cette action est irrersible et elle entrainera : <br><br> La suppression dudit article dans tous les devis et factures, ce qui affectera toutes les statistiques financières.</p>
+                                  </div>
+                                  <div class="modal-footer">
+													          <form id="formArticle" action="{% url 'delete_article' %}" method="post">
+													            <div class="mb-3">
+													            	{% csrf_token %}
+													              <input type="hidden" name="usr" value="{{usr}}">
+													              <input type="hidden" name="com" value="{{com}}">
+													              <input type="hidden" name="article_id" value="{{article.uuid}}">
+													            </div>
+													            <div class="text-end">
+													              <button type="submit" class="btn btn-danger light px-4">Supprimer</button>
+													          </form>
+													            </div>
+													          		<button type="button" class="btn btn-primary px-4 mt-2" data-dismiss="modal">Annuler</button>
+									               </div>
+									           </div>
+									       </div>
+										</ul>
+									</div>
+								</div>
+							</div>
+							<div class="col-xl-12 col-lg-6 col-sm-6">
+								<div class="card">
+		                            <div class="card-header border-0 pb-0">
+										<h2 class="card-title">Détails</h2>
+									</div>
+									<div class="card-body pb-0">
+										<ul class="list-group list-group-flush">
+											<li class="list-group-item d-flex px-0 justify-content-between">
+												<strong>Designation</strong>
+												<span class="mb-0">{{article.nom}}</span>
+											</li>
+											<li class="list-group-item d-flex px-0 justify-content-between">
+												<strong>Type</strong>
+											{% if article.type == 'BIE' %}
+												<span class="mb-0">Bien</span>
+											{% else %}
+												<span class="mb-0">Service</span>
+											{% endif %}
+											</li>
+											<li class="list-group-item d-flex px-0 justify-content-between">
+												<strong>Categorie</strong>
+											{% if article.categorie == '' %}
+												<span class="badge badge-danger light mb-0">Aucune</span>
+											{% else %}
+												<span class="mb-0">{{article.categorie}}</span>
+											{% endif %}
+											</li>
+											<li class="list-group-item d-flex px-0 justify-content-between">
+												<strong>Mesure</strong>
+											{% if article.mesure == '' %}
+												<span class="badge badge-danger light mb-0">Aucune</span>
+											{% else %}
+												<span class="mb-0">{{article.mesure}}</span>
+											{% endif %}
+											</li>
+											<li class="list-group-item d-flex px-0 justify-content-between">
+												<strong>Prix</strong>
+												<span class="mb-0">{{article.prixht}}{{article.devise}}</span>
+											</li>
+											<li class="list-group-item d-flex px-0 justify-content-between">
+												<strong>Groupe</strong>
+												<span class="mb-0">[{{article.code_groupe}}] {{article.groupe}} {{article.taux_groupe}}%</span>
+											</li>
+											<li class="list-group-item d-flex px-0 justify-content-between">
+												<strong>Prix TTC</strong>
+												<span class="mb-0">{{article.prixttc}}{{article.devise}}</span>
+											</li>
+											<li class="list-group-item d-flex px-0 justify-content-between">
+												<strong>Taxe specifique</strong>
+											{% if article.taux_taxe == '' %}
+												<span class="badge badge-danger light mb-0">Aucune</span>
+											{% else %}
+												<span class="mb-0">{{article.taux_taxe}}%</span>
+											{% endif %}
+											</li>
+											<li class="list-group-item d-flex px-0 justify-content-between">
+												<strong>Mode</strong>
+												<span class="mb-0">{{article.mode}}</span>
+											</li>
+										</ul>
+		                            </div>
+		                            <div class="card-footer pt-0 pb-0 text-center">
+		                                <div class="row">
+											<div class="col-4 pt-3 pb-3 border-right">
+												<h3 class="mb-1 text-primary">{{article.stock}}</h3>
+												<span style="font-size: 13px;">Entrées</span>
+											</div>
+											<div class="col-4 pt-3 pb-3 border-right">
+												<h3 class="mb-1 text-primary">{{article.facture}}</h3>
+												<span style="font-size: 13px;">Factures</span>
+											</div>
+											<div class="col-4 pt-3 pb-3">
+												<h3 class="mb-1 text-primary">{{article.devis}}</h3>
+												<span style="font-size: 13px;">Devis</span>
+		                                    </div>
+		                                </div>
+		                            </div>
+		                        </div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<script src="{% static 'js/Chart.js' %}"></script>	
+	<script>
+    	var canvasP = document.getElementById('pie')
+    	var ctx = canvasP.getContext('2d');
+    	var fraischart = new Chart(ctx, {
+    		type: 'doughnut',
+    		data: {
+    			labels: ["Entrées", "Facture", "Paiements", "Devis"],
+    		   	datasets: [{
+    		    data: {{graph_stat|safe }},
+    		    borderColor: "rgba(255,255,255,1)",
+				backgroundColor: ['#ec8153', '#70b944','#498bd9','#6647bf'],
+    		    borderWidth: 1
+    		   }]
+    		},
+    	});
+
+    	var canvasP = document.getElementById('bar')
+		var ctx = canvasP.getContext('2d');
+		var fraischart = new Chart(ctx, {
+			type: 'bar',
+			data: {
+				labels: {{mois_label|safe}},
+				datasets: [
+				{
+					label: 'Entrées de stock',
+					data: {{stat_mois_stock|safe}},
+					backgroundColor: '#ec8153'
+				},
+				{
+					label: 'Factures',
+					data: {{stat_mois_facture|safe}},
+					backgroundColor: '#70b944'
+				},
+				{
+					label: 'Paiement',
+					data: {{stat_mois_paiement|safe}},
+					backgroundColor: '#498bd9'
+				}
+				]
+			},
+			options: {
+				responsive: true,
+				scales: {
+				y: {
+					beginAtZero: true,
+					title: {
+					display: true,
+					text: 'Valeurs'
+					}
+				}
+				},
+				plugins: {
+				title: {
+					display: true,
+					text: 'Ventes, Stock et Bénéfices — 5 derniers mois'
+				}
+				}
+			}
+		});
+   </script>
+
+{% endblock %}

@@ -1,0 +1,469 @@
+import requests
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+import json
+
+
+@csrf_exempt  # désactive la protection CSRF pour les tests via Postman
+def envoyer_facture(request):
+    if request.method == "POST":
+        try:
+            # URL de l’API DGI
+            url = "https://developper.dgirdc.cd/edef/api/invoice"
+
+            # En-têtes HTTP (headers)
+            headers = {
+                "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6IkEyMTUyMzUxQ3xDRDAxMDAyNzE3LTEiLCJyb2xlIjoiVGF4cGF5ZXIiLCJuYmYiOjE3NjA4NTQxNjUsImV4cCI6MTc2NzEzNTYwMCwiaWF0IjoxNzYwODU0MTY1LCJpc3MiOiJkZXZlbG9wcGVyLmRnaXJkYy5jZCIsImF1ZCI6ImRldmVsb3BwZXIuZGdpcmRjLmNkIn0.CrNqRDUuM9MLO2e-lBnXcm40aQ1gyfJQaiGR2oj_MJ0",
+                "Accept": "text/plain",
+                "Content-Type": "application/json-patch+json",
+            }
+
+            # Données de la facture
+            payload = {
+                "nif": "A2152351C",
+                "rn": "RN-20251019-001",
+                "mode": "ttc",
+                "isf": "ABC-DEF-01",
+                "type": "FV",
+                "items": [
+                    {
+                        "code": "PRD-001",
+                        "name": "Ordinateur Portable Lenovo ThinkBook 15",
+                        "type": "BIE",
+                        "price": 850.00,
+                        "quantity": 2,
+                        "taxGroup": "A",
+                        "taxSpecificValue": "0%",
+                        "taxSpecificAmount": 0,
+                        "originalPrice": 850.00,
+                        "priceModification": "Aucune remise",
+                    },
+                    {
+                        "code": "PRD-002",
+                        "name": "Souris sans fil Logitech M185",
+                        "type": "BIE",
+                        "price": 25.00,
+                        "quantity": 3,
+                        "taxGroup": "A",
+                        "taxSpecificValue": 0,
+                        "taxSpecificAmount": 0,
+                        "originalPrice": 25.00,
+                        "priceModification": "Aucune remise",
+                    },
+                ],
+                "client": {
+                    "nif": "C987654321",
+                    "type": "PM",
+                    "typeDesc": "Personne morale",
+                    "name": "TechnoServices SARL",
+                    "contact": "+243 820 123 456",
+                    "address": "Av. du Commerce N°45, Gombe, Kinshasa",
+                },
+                "operator": {"id": "OP-007", "name": "Kabasele Jean"},
+                "payment": [
+                    {"name": "ESPECES", "amount": 1772.00, "curCode": "CDF", "curRate": 1}
+                ],
+                "reference": "",
+                "referenceType": "",
+                "referenceDesc": "",
+                "cmta": "Livraison prévue sous 48h",
+                "cmtb": "Garantie 12 mois",
+                "cmtc": "Service après-vente inclus",
+                "cmtd": "",
+                "cmte": "",
+                "cmtf": "",
+                "cmtg": "",
+                "cmth": "",
+                "curCode": "CDF",
+                "curDate": "2025-10-19T06:33:16.729Z",
+                "curRate": 1,
+            }
+
+            # Envoi de la requête POST
+            response = requests.post(url, headers=headers, json=payload)
+
+            # Analyse de la réponse
+            if response.status_code in (200, 201):
+                data = response.json()
+                print("✅ Réponse DGI :", data)
+                return JsonResponse(data, safe=False)
+            else:
+                print("❌ Erreur API DGI :", response.status_code, response.text)
+                return JsonResponse(
+                    {
+                        "error": "Erreur lors de l’envoi de la facture",
+                        "details": response.text,
+                    },
+                    status=response.status_code,
+                )
+
+        except Exception as e:
+            print("⚠️ Exception :", e)
+            return JsonResponse({"error": str(e)}, status=500)
+
+    return JsonResponse({"error": "Méthode non autorisée"}, status=405)
+
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script>
+    // Cette fonction prépare les données avant l’envoi
+    function prepareFormData() {
+      const client = {
+        name: document.getElementById('clientName').value,
+        phone: document.getElementById('clientPhone').value
+      };
+
+      const items = [];
+      document.querySelectorAll('#articlesBody tr').forEach(row => {
+        const article = row.querySelector('.article-name').value;
+        const price = row.querySelector('.price').value;
+        const qty = row.querySelector('.qty').value;
+        if (article && qty > 0) {
+          items.push({ article, price, qty });
+        }
+      });
+
+      // Mettre les données en JSON dans un champ caché
+      document.getElementById('jsonData').value = JSON.stringify({
+        client, items
+      });
+    }
+  </script>
+</head>
+
+<body class="bg-light py-4">
+  <div class="container">
+    <div class="card shadow-lg">
+      <div class="card-header bg-primary text-white text-center">
+        <h4>🧾 Formulaire de Vente d'Article</h4>
+      </div>
+      <div class="card-body">
+        <form method="POST" action="{% url 'save_vente' %}" onsubmit="prepareFormData()">
+          {% csrf_token %}
+
+          <!-- Infos client -->
+          <h5 class="text-secondary mb-3">Informations du client</h5>
+          <div class="row g-3 mb-4">
+            <div class="col-md-6">
+              <label class="form-label">Nom du client</label>
+              <input type="text" class="form-control" id="clientName" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Téléphone</label>
+              <input type="text" class="form-control" id="clientPhone">
+            </div>
+          </div>
+
+          <!-- Table articles -->
+          <h5 class="text-secondary mb-3">Articles vendus</h5>
+          <table class="table table-bordered align-middle text-center" id="articlesTable">
+            <thead class="table-primary">
+              <tr>
+                <th>Article</th>
+                <th>Prix (FC)</th>
+                <th>Quantité</th>
+                <th>Total (FC)</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="articlesBody">
+              <tr>
+                <td><input type="text" class="form-control article-name" required></td>
+                <td><input type="number" class="form-control price" min="0" value="0"></td>
+                <td><input type="number" class="form-control qty" min="1" value="1"></td>
+                <td class="lineTotal">0</td>
+                <td><button type="button" class="btn btn-danger btn-sm removeRow">🗑️</button></td>
+              </tr>
+            </tbody>
+          </table>
+          <button type="button" class="btn btn-success btn-sm" id="addRow">➕ Ajouter un article</button>
+
+          <!-- Total -->
+          <div class="mt-4 text-end">
+            <h5>Total général : <span id="grandTotal" class="text-primary fw-bold">0 FC</span></h5>
+          </div>
+
+          <!-- Champ caché pour Django -->
+          <input type="hidden" name="jsonData" id="jsonData">
+
+          <!-- Boutons -->
+          <div class="mt-4 text-end">
+            <button class="btn btn-primary" type="submit">💾 Enregistrer la vente</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const tableBody = document.getElementById('articlesBody');
+    const grandTotalDisplay = document.getElementById('grandTotal');
+
+    function updateTotals() {
+      let total = 0;
+      document.querySelectorAll('#articlesBody tr').forEach(row => {
+        const p = parseFloat(row.querySelector('.price').value) || 0;
+        const q = parseFloat(row.querySelector('.qty').value) || 0;
+        const t = p * q;
+        row.querySelector('.lineTotal').textContent = t.toLocaleString('fr-FR');
+        total += t;
+      });
+      grandTotalDisplay.textContent = total.toLocaleString('fr-FR') + ' FC';
+    }
+
+    document.getElementById('addRow').addEventListener('click', () => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td><input type="text" class="form-control article-name" required></td>
+        <td><input type="number" class="form-control price" min="0" value="0"></td>
+        <td><input type="number" class="form-control qty" min="1" value="1"></td>
+        <td class="lineTotal">0</td>
+        <td><button type="button" class="btn btn-danger btn-sm removeRow">🗑️</button></td>
+      `;
+      tableBody.appendChild(tr);
+    });
+
+    tableBody.addEventListener('input', e => {
+      if (e.target.classList.contains('price') || e.target.classList.contains('qty')) {
+        updateTotals();
+      }
+    });
+
+    tableBody.addEventListener('click', e => {
+      if (e.target.classList.contains('removeRow')) {
+        e.target.closest('tr').remove();
+        updateTotals();
+      }
+    });
+  </script>
+
+
+  <div class="card-header d-sm-flex d-block">
+            <div class="mr-auto mb-sm-0 mb-3">
+              <h4 class="card-title mb-2">Toutes les factures </h4>
+              <span class="ml-1" style="font-size: 12px;">Dernière mise à jour le {{maj}}</span>
+            </div>
+            <div class="input-group search-area right d-lg-inline-flex d-none">
+                <input type="text" class="form-control" placeholder="Rechercher une facture">
+                <div class="input-group-append">
+                  <span class="input-group-text">
+                    <a href="javascript:void(0)">
+                      <i class="flaticon-381-search-2"></i>
+                    </a>
+                  </span>
+                </div>
+              </div>
+            <a href="javascript:void(0);" class="btn btn-info light mr-3 ml-3"><i class="las la-filter mr-2"></i>Filtre</a>
+            <!-- <a href="javascript:void(0);" class="btn btn-info">+ Add Customer</a> -->
+                        <button type="button" class="btn btn-primary mb-2" data-toggle="modal" data-target="#md"><i class="las la-plus mr-2"></i>
+                            Ajouter une facture 
+                        </button>
+                        <!-- modale  -->
+                         <div class="modal fade" id="md">
+                            <div class="modal-dialog modal-dialog-centered" style="max-width: 50vw; margin-right: 0;">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title">Nouvelle facture</h5>
+                                         <button type="button" class="close" data-dismiss="modal"><span>&times;</span> </button>
+                                    </div>
+                                    <div class="modal-body">
+                                    
+        
+      <form id="factureForm" action="{% url 'facture' %}" method="post">
+        {% csrf_token %}
+        <input type="hidden" name="usr" value="{{usr}}">
+        <input type="hidden" name="com" value="{{com}}">
+        <div class="row g-3">
+
+          <!-- Informations générales -->
+
+          <div class="col-md-12 mb-2">
+            <label class="form-label">Client</label>
+            <select id="client" name="client" class="form-select" required>
+              <option value="">-- Sélectionner --</option>
+            {% for i in clients %}
+              <option value="{{i.nom}}"> {{i.nom}} </option>
+            {% endfor %}
+            </select>
+          </div>
+
+          <div class="col-md-12 mb-2">
+            <label class="form-label">Mode de facture</label>
+            <select id="mode_facture" name="mode" class="form-select">
+              <option value="">-- Sélectionner --</option>
+              <option value="TTC">Toutes Taxes Comprises</option>
+              <option value="HT">Hors Taxes</option>
+            </select>
+          </div>
+
+          <div class="col-md-12 mb-2">
+            <label class="form-label">Type de facture</label>
+            <select id="type_facture" name="type" class="form-select" required>
+              <option value="">-- Sélectionner --</option>
+              <option value="standard">Facture standard</option>
+              <option value="avoir">Facture d’avoir</option>
+              <option value="proforma">Facture proforma</option>
+            </select>
+          </div>
+
+          <!-- Section visible uniquement si type = "avoir" -->
+          <div class="col-md-6 d-none" id="nature_avoir_container">
+            <label class="form-label">Nature de la facture d’avoir</label>
+            <input type="text" name="nature" class="form-control" id="nature_avoir" placeholder="Ex: Retour de marchandise">
+          </div>
+
+          <div class="col-md-6 d-none" id="ref_facture_base_container">
+            <label class="form-label">Référence de la facture de base</label>
+            <input type="text" name="ref" class="form-control" id="ref_facture_base" placeholder="Ex: FAC-2025-045">
+          </div>
+
+          <div class="col-md-12 mt-2 mb-2">
+            <label class="form-label">Taux d’échange</label>
+            <select id="taux" name="taux" class="form-select" required>
+              <option value="">-- Sélectionner --</option>
+              {% for i in taux %}
+                <option value="{{i.Uuid}}"> {{i.Libelle}} Fc</option>
+              {% endfor %}
+            </select>
+            <button type="button" class="text-center ml-2 btn btn-xs px-1 py-1 light btn-success" data-toggle="modal" data-target="#cat"><i class="las la-plus" style="font-size: 18px;"></i></button>
+          </div>
+        </div>
+
+        <hr class="my-4">
+
+        <!-- Tableau des articles -->
+        <h5 class="mb-3">Articles</h5>
+        <table class="table table-bordered align-middle" id="articlesTable">
+          <thead class="table-light">
+            <tr>
+              <th>Article</th>
+              <th>Quantité</th>
+              <th>Prix Unitaire</th>
+              <th>Groupe Taxation</th>
+              <th>Total</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="articlesBody">
+            <tr>
+              <td>
+                <input type="text" name="article" class="form-control" placeholder="Nom de l'article">
+              </td>
+              <td><input type="number" name="quantite" class="form-control qte" value="1" min="1"></td>
+              <td><input type="number" name="prix" class="form-control prix" step="0.01" value="0"></td>
+              <td><input type="text" name="groupe" class="form-control prix"></td>
+              <td class="total-ligne">0</td>
+              <td>
+                <button type="button" class="btn btn-danger btn-sm removeArticle">
+                  <svg width="20" height="20" viewbox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M3 6H5H21" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                    <path d="M8 6V4C8 3.46957 8.21071 2.96086 8.58579 2.58579C8.96086 2.21071 9.46957 2 10 2H14C14.5304 2 15.0391 2.21071 15.4142 2.58579C15.7893 2.96086 16 3.46957 16 4V6M19 6V20C19 20.5304 18.7893 21.0391 18.4142 21.4142C18.0391 21.7893 17.5304 22 17 22H7C6.46957 22 5.96086 21.7893 5.58579 21.4142C5.21071 21.0391 5 20.5304 5 20V6H19Z" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                  </svg>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <button type="button" class="btn btn-success mb-3" id="addArticle"><i class="las la-plus mr-2"></i> Ajouter un article</button>
+
+        <div class="text-end">
+          <h5>Total général : <span id="totalGeneral">0</span> FCFA</h5>
+        </div>
+
+        <hr class="my-4">
+
+        <button type="submit" class="btn btn-primary w-100">Créer la facture</button>
+      </form>
+    <div class="modal fade" id="cat">
+              <div class="modal-dialog modal-dialog-centered" style="max-width: 50vw; margin-right: 0;">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title">Nouveau taux</h5>
+                    <button type="button" class="close" data-dismiss="modal"><span>&times;</span> </button>
+                  </div>
+                <div class="modal-body">
+                <form id="formArticle" action="{% url 'taux' %}" method="post">
+                  <div class="mb-3">
+                    {% csrf_token %}
+                    <label class="form-label">Libellé</label>
+                    <input type="hidden" name="usr" value="{{usr}}">
+                    <input type="hidden" name="com" value="{{com}}">
+                    <input type="number" name="lib" class="form-control" id="lib" placeholder="Ex: 2160" required>
+                  </div>
+                  <div class="text-end">
+                    <button type="submit" class="btn btn-primary px-4">AJOUTER</button>
+                  </div>
+                </form>
+               </div>
+           </div>
+       </div>
+    </div>
+  </div>
+</div>
+
+  <!-- Bootstrap JS + Script personnalisé -->
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      const typeFacture = document.getElementById("type_facture");
+      const natureAvoir = document.getElementById("nature_avoir_container");
+      const refFactureBase = document.getElementById("ref_facture_base_container");
+      const addArticleBtn = document.getElementById("addArticle");
+      const articlesBody = document.getElementById("articlesBody");
+      const totalGeneral = document.getElementById("totalGeneral");
+
+      // Gère la visibilité des champs spécifiques aux factures d’avoir
+      typeFacture.addEventListener("change", function() {
+        if (this.value === "avoir") {
+          natureAvoir.classList.remove("d-none");
+          refFactureBase.classList.remove("d-none");
+        } else {
+          natureAvoir.classList.add("d-none");
+          refFactureBase.classList.add("d-none");
+        }
+      });
+
+      // Ajouter une ligne d’article
+      addArticleBtn.addEventListener("click", function() {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td><input type="text" class="form-control" placeholder="Nom de l'article"></td>
+          <td><input type="number" class="form-control qte" value="1" min="1"></td>
+          <td><input type="number" class="form-control prix" step="0.01" value="0"></td>
+          <td>
+            <select class="form-select">
+              <option value="0">0%</option>
+              <option value="5">5%</option>
+              <option value="10">10%</option>
+              <option value="18">18%</option>
+            </select>
+          </td>
+          <td class="total-ligne">0</td>
+          <td><button type="button" class="btn btn-danger btn-sm removeArticle">🗑</button></td>
+        `;
+        articlesBody.appendChild(row);
+      });
+
+      // Calcul automatique des totaux
+      document.addEventListener("input", function() {
+        let total = 0;
+        document.querySelectorAll("#articlesBody tr").forEach(row => {
+          const qte = parseFloat(row.querySelector(".qte").value) || 0;
+          const prix = parseFloat(row.querySelector(".prix").value) || 0;
+          const taxe = parseFloat(row.querySelector("select").value) || 0;
+          const totalLigne = qte * prix * (1 + taxe / 100);
+          row.querySelector(".total-ligne").textContent = totalLigne.toFixed(2);
+          total += totalLigne;
+        });
+        totalGeneral.textContent = total.toFixed(2);
+      });
+
+      // Suppression d’une ligne
+      document.addEventListener("click", function(e) {
+        if (e.target.classList.contains("removeArticle")) {
+          e.target.closest("tr").remove();
+          document.dispatchEvent(new Event("input"));
+        }
+      });
+    });
+  </script>

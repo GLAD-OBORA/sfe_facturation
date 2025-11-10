@@ -1,0 +1,151 @@
+{% extends 'liste-fournisseurs.html' %}
+{% load static %}
+		
+
+{% block fournisseur %}
+	<div class="card">			
+		<div class="card-body">
+			<div class="modal-header">
+				<a href="/fournisseurs/?usr={{usr}}&com={{com}}" class="close"><span>&times;</span> </a>
+			</div>
+			<div class="card-body">
+				<div class="text-center">
+					<div class="my-profile">
+						<img src="{% static acteur.photo %}" alt="" class="rounded">
+						<a href="#" role="button" data-toggle="modal" data-target="#cameraModal"><i class="fa fa-pencil" aria-hidden="true"></i></a>
+						<!-- Modal -->
+						<div class="modal fade" id="cameraModal">
+							<div class="modal-dialog modal-dialog-centered" role="document">
+								<div class="modal-content">
+									<div class="modal-header">
+										<h5 class="modal-title">Importer une photo</h5>
+										<button type="button" class="close" data-dismiss="modal"><span>&times;</span>
+										</button>
+									</div>
+									<div class="modal-body">
+									<form action="{% url 'photo_fournisseur' %}" method="post" enctype="multipart/form-data">
+										{% csrf_token %}
+										<input type="hidden" name="usr" value="{{usr}}">
+										<input type="hidden" name="com" value="{{com}}">
+										<input type="hidden" name="acteur_id" value="{{acteur.uuid}}">
+										<div class="input-group mb-3">
+											<div class="input-group-prepend">
+												<button class="input-group-text" type="submit">Valider</button>
+											</div>
+											<div class="custom-file">
+												<input type="file" class="custom-file-input" id="fileInput" accept="image/*" name="photo" required>
+												<label class="custom-file-label">Choisir un fichier</label>
+											</div>
+										</div>
+									</form>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<p class="text-danger mt-2">{{message}}</p>
+					<h4 class="mt-3 font-w600 text-black mb-0 name-text">{{acteur.nom}}</h4>
+					<span>[{{acteur.code}}]</span>
+					<p class="mb-0 mt-2">Dernière mise à jour le {{acteur.date}}</p>
+				</div>
+				<ul class="portofolio-social">
+					<li><a href="/details_fournisseur/?usr={{usr}}&com={{com}}&acteur={{acteur.uuid}}"><i class="fa fa-eye"></i></a></li>
+					<li><a href="#" role="button" data-toggle="modal" data-target="#modalConfirm"><i class="fa fa-trash"></i></a>
+							<div class="modal fade" id="modalConfirm">
+									          <div class="modal-dialog modal-dialog-centered" style="max-width: 50vw">
+									              <div class="modal-content">
+									                <div class="modal-header">
+									                  <h5 class="modal-title">Confirmation</h5>
+									                  <button type="button" class="close" data-dismiss="modal"><span>&times;</span> </button>
+									                </div>
+									                <div class="modal-body">
+                                    <p>Voulez-vous vraiment supprimer le fournisseur <strong>{{acteur.nom}}</strong> ? Cette action est irrersible et elle entrainera : <br><br> La suppression dudit article dans tous les devis et factures, ce qui affectera toutes les statistiques financières.</p>
+                                  </div>
+                                  <div class="modal-footer">
+													          <form id="formArticle" action="{% url 'delete_fournisseur' %}" method="post">
+													            <div class="mb-3">
+													            	{% csrf_token %}
+													              <input type="hidden" name="usr" value="{{usr}}">
+													              <input type="hidden" name="com" value="{{com}}">
+													              <input type="hidden" name="acteur_id" value="{{acteur.uuid}}">
+													            </div>
+													            <div class="text-end">
+													              <button type="submit" class="btn btn-danger light px-4">Supprimer</button>
+													          </form>
+													            </div>
+													          		<button type="button" class="btn btn-primary px-4 mt-2" data-dismiss="modal">Annuler</button>
+									               </div>
+									           </div>
+									       </div>
+									     </div></li>
+                       <li><a href="/mails/?usr={{usr}}&com={{com}}&destination={{acteur.uuid}}"><i class="fa fa-envelope-o"></i></a></li>
+				</ul>
+			</div>
+				<div class="card">
+          <div class="card-body">
+            <form class="p-4 border rounded shadow-sm bg-white" action="{% url 'infos_fournisseur' %}" method="post">
+        {% csrf_token %}
+        <input type="hidden" name="usr" value="{{usr}}">
+        <input type="hidden" name="com" value="{{com}}">
+        <input type="hidden" name="acteur" value="{{acteur.uuid}}">
+        <!-- Type de client -->
+        <div class="form-row">
+    <div class="form-group col-md-6">
+      <label for="type" class="form-label">Type de fournisseur</label>
+          <select id="type" name="type" class="form-control default-select" required>
+            <option value="">-- Sélectionner un type --</option>
+            <option value="PP" {% if acteur.code == "PP" %} selected {% endif %}>Personne Physique</option>
+            <option value="PM" {% if acteur.code == "PM" %} selected {% endif %}>Personne Morale</option>
+            <option value="AO" {% if acteur.code == "AO" %} selected {% endif %}>Ambassade / Organisation Internationale</option>
+            <option value="ET" {% if acteur.code == "ET" %} selected {% endif %}>Entreprise Tiers</option>
+            <option value="OT" {% if acteur.code == "OT" %} selected {% endif %}>Autre</option>
+          </select>
+    </div>
+
+    <div class="form-group col-md-6">
+      <label for="name" class="form-label">Nom du fournisseur</label>
+      <input type="text" id="name" name="nom" class="form-control" placeholder="Ex: Jean Dupont" value="{{acteur.nom}}" required>
+    </div>
+  </div>
+
+        <!-- NIF -->
+        <div class="mb-3" id="nif-container">
+          <label for="nif" class="form-label">NIF</label>
+          <input type="text" id="nif" name="nif" class="form-control" placeholder="Numéro d'identification fiscale" value="{{acteur.nif}}">
+        </div>
+
+        <div class="form-row">
+          <div class="form-group col-md-6">
+          <label for="contact" class="form-label">Contact</label>
+          <input type="text" id="contact" name="tel" class="form-control" placeholder="Ex: +242 06 123 4567" value="{{acteur.num}}">
+          </div>
+
+          <div class="form-group col-md-6">
+            <label for="contact" class="form-label">Email</label>
+            <input type="text" id="contact" name="email" class="form-control" placeholder="Ex: salut@exemple.com" value="{{acteur.email}}">
+          </div>
+        </div>
+
+        <!-- Adresse -->
+        <div class="mb-3">
+          <label for="address" class="form-label">Adresse</label>
+          <input id="address" name="adresse" class="form-control" rows="2" placeholder="Ex: 12 Rue de la Paix, Brazzaville" value="{{acteur.adresse}}">
+        </div>
+
+        <!-- Ref Document (uniquement pour AO) -->
+        <div class="mb-3">
+          <label for="ref_document" class="form-label">Référence du document</label>
+          <input type="text" id="ref_document" name="refdoc" class="form-control" placeholder="Ex: REF-12345" value="{{acteur.ref}}">
+        </div>
+
+        <div class="text-end">
+              <button type="submit" class="btn btn-primary px-4">Valider</button>
+            </div>
+      </form>    
+               </div>
+           </div>
+       </div>
+		</div>
+	</div>
+
+{% endblock %}

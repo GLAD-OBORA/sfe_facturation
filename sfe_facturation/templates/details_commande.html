@@ -1,0 +1,490 @@
+{% extends 'facturation.html' %}
+{% load static %}
+    
+{% block paiement %}
+
+                <!-- row -->
+                <div class="row">
+                    <div class="col-xl-8">
+                    	<div class="row">
+                    		<div class="col-xl-4 col-xxl-12">
+								<div class="card">
+									<div class="card-header pb-0 d-block d-sm-flex flex-wrap border-0 align-items-center">
+										<div class="mr-auto mb-3">
+											<h4 class="fs-20 text-black">Statistiques générales</h4>
+											<p class="mb-0 fs-12">Dernière mise à jour le {{facture.maj}}</p>
+										</div>
+									</div>
+									<div class="card-body pb-0 pt-sm-3 pt-0">
+										<div class="row sp20 mb-4 align-items-center">
+											<div class="col-lg-4 col-xxl-4 col-sm-4 d-flex flex-wrap align-items-center">
+												<div class="px-2 info-group">
+													<p class="fs-18 mb-1">Solde</p>
+													<div class="d-flex">
+													{% if facture.solde < 0 %}
+														<h2 class="fs-28 font-w600">
+															<span class="text-danger mr-1">{{facture.solde}}</span>
+														</h2>
+														<h2 class="fs-28 font-w600">
+															<span class="text-danger mr-1">{{facture.devise}}</span>
+														</h2>
+													{% else %}
+														<h2 class="fs-28 font-w600">
+															<span class="text-success mr-1">{{facture.solde}}</span>
+														</h2>
+														<h2 class="fs-28 font-w600">
+															<span class="text-success mr-1">{{facture.devise}}</span>
+														</h2>
+													{% endif %}
+													</div>
+												</div>
+											</div>
+											<div class="d-flex col-lg-8 col-xxl-8 co-sm-8 align-items-center mt-sm-0 mt-3 justify-content-end">
+												<div class="px-2 info-group">
+													<p class="fs-14 mb-1">Total</p>
+													<h3 class="fs-20 font-w600">{{facture.devise}} {{facture.total}}
+													</h3>
+												</div>
+												<div class="px-2 info-group">
+													<p class="fs-14 mb-1">Paiement</p>
+													<h3 class="fs-20 font-w600 text-black">{{facture.devise}} {{facture.paiement}}</h3>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+					<div class="col-xl-4 col-xxl-12">
+                        <div class="card">
+                        	<div class="card-header pb-0 d-block d-sm-flex flex-wrap border-0 align-items-center">
+								<div class="mr-auto mb-3">
+									<h4 class="fs-20 text-black">Données facture</h4>
+									<p class="mb-0 fs-12">Dernière mise à jour le {{facture.date}}</p>
+								</div>
+							</div>
+                            <div class="card-body">
+                                <div class="profile-tab">
+                                    <div class="custom-tab-1">
+                                        <ul class="nav nav-tabs">
+                                            <li class="nav-item"><a href="#my-posts" data-toggle="tab" class="nav-link active show">Articles</a>
+                                            </li>
+                                            <li class="nav-item"><a href="#about-me" data-toggle="tab" class="nav-link">Commentaires</a>
+                                            </li>
+                                            <li class="nav-item"><a href="#profile-settings" data-toggle="tab" class="nav-link">Paiement</a>
+                                            </li>
+                                        </ul>
+                                        <div class="tab-content">
+                                            <div id="my-posts" class="tab-pane fade active show">
+                                                <div class="my-post-content pt-3">
+                                                	<div class="card">
+							                            <div class="card-body">
+							                                <div class="table-responsive">
+							                                    <table class="table table-responsive-md">
+							                                        <thead>
+							                                            <tr>
+							                                                <th>#</th>
+							                                                <th>Designation</th>
+							                                                <th>Type</th>
+							                                                <th>Groupe</th>
+							                                                <th>Quantité</th>
+							                                                <th>Prix[TTC]</th>
+							                                                <th>Total[TTC]</th>
+							                                            </tr>
+							                                        </thead>
+							                                        <tbody>
+							                                        {% for i in items %}
+							                                          	<tr>
+							                                                <td>{{i.id}}</td>
+							                                                <td><div class="d-flex align-items-center"><a href="/detail_article/?usr={{usr}}&com={{com}}&article={{i.uuid}}"><img src="{% static i.photo %}" class="rounded-lg mr-2" width="24" alt=""></a><span class="w-space-no">{{i.nom}}</span></div></td>
+							                                                <td>
+							                                                {% if i.type == '[BIE]' %}
+							                                                	<span class="badge badge-success light">{{i.type}}</span>
+							                                                {% else %}
+							                                                	<span class="badge badge-info light">{{i.type}}</span>
+							                                                {% endif %}
+							                                                </td>
+							                                                <td class="d-flex">{{i.groupe}}</td>
+							                                                <td>{{i.quantite}}</td>
+							                                                <td>{{i.prixttc}} {{i.devise}}</td>
+							                                                <td>{{i.total}} {{i.devise}}</td>
+							                                            </tr>
+							                                        {% endfor %}
+							                                        </tbody>
+							                                    </table>
+							                                </div>
+							                            </div>
+							                        </div>
+                                                </div>    
+                                            </div>
+                                            <div id="about-me" class="tab-pane fade">
+                                                <div class="profile-about-me">
+                                                {% for i in comments %}
+                                                    <div class="alert alert-light solid alert-rounded mt-3">{{i.Texte}}.</div>
+                                                {% endfor %}
+                                                </div>
+                                            </div>
+                                            <div id="profile-settings" class="tab-pane fade">
+                                                <div class="pt-3">
+                                                    <div class="settings-form">
+                                                        <form action="{% url 'paiement' %}" method="post">
+                                                        	{% csrf_token %}
+													        <input type="hidden" name="usr" value="{{usr}}">
+													        <input type="hidden" name="com" value="{{com}}">
+													        <input type="hidden" name="facture" value="{{facture.uuid}}">
+                                                            <div class="form-row">
+                                                                <div class="form-group col-md-6">
+                                                                    <label>Montant</label>
+                                                                    <input type="number" step="0.01" class="form-control" id="montant" name="montant" value="{{montant}}" placeholder="0.00" max="{{facture.reste}}">
+                                                                </div>
+                                                                <div class="form-group col-md-6">
+                                                                    <label for="type_facture" class="form-label">Devise</label>
+													                <select class="form-control default-select" id="devise" name="devise" required>
+													                    <option value="">-- Sélectionner --</option>
+													                    <option value="USD">USD</option>
+													                    <option value="CDF">CDF</option>
+													                </select>
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label for="mode_paiement" class="form-label">Mode de paiement</label>
+													            <select class="form-control default-select" id="mode_paiement" name="mode_paiement">
+													                <option value="">-- Sélectionner --</option>
+													                <option>Espèces</option>
+													                <option>Transfert</option>
+													            </select>
+                                                            </div>
+                                                            <div class="form-row" id="compteSection" style="display:none;">
+	                                                                <div class="form-group">
+	                                                                    <label for="compte">Compte</label>
+	                                                                    <select class="form-control default-select" id="compte" name="compte">
+	                                                                        <option value="">-- Sélectionner --</option>
+	                                                                    {% for i in compte %}
+	                                                                       	<option value="{{i.Uuid}}">{{i}}</option>
+	                                                                    {% endfor %}   
+	                                                                    </select>
+	                                                                </div>
+                                                            </div>
+                                                        {% if reste == 0 %}
+                                                            <button class="btn btn-primary" type="submit" disabled="">Enregistrer</button>
+                                                        {% else %}
+                                                        	<button class="btn btn-primary" type="submit" >Enregistrer</button>
+                                                        {% endif %}
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-footer d-flex">
+                            <form action="{% url 'email' %}" method="post">
+                            	{% csrf_token %}
+							  	<input type="hidden" name="usr" value="{{usr}}">
+							  	<input type="hidden" name="com" value="{{com}}">
+							  	<input type="hidden" name="file" value="{{facture.uuid}}">
+							  	<input type="hidden" name="destination" value="{{client.uuid}}">
+                            	<button type="submit" class="btn btn-info mr-2">Envoyer<span class="btn-icon-right"><i class="fa fa-envelope"></i></span>
+                                </button>
+                            </form>
+                                <a href="/sfe_facturation/static/media/{{facture.uuid}}.pdf" download="" class="btn btn-success mr-2">Télécharger <span class="btn-icon-right"><i class="fa fa-download"></i></span>
+                                </a>
+                                <a href="/sfe_facturation/static/media/{{facture.uuid}}.pdf" class="btn btn-warning">Ouvrir <span class="btn-icon-right"><i class="fa fa-file"></i></span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-4 col-xxl-12">
+                    	<div class="card">
+                    		<div class="card-body">
+                    			<embed src="{% static lien_facture %}" type="application/pdf" width="100%" height="600px">
+                    		</div>
+                    	</div>
+                    </div>
+                    <div class="col-xl-4 col-xxl-12">
+                    <div class="card">
+                    	<div class="card-header pb-2 d-block d-sm-flex flex-wrap border-0">
+							<div class="mb-3">
+								<h4 class="fs-20 text-black">Paiements</h4>
+								<p class="mb-0 fs-13">Dernière mise à jour le {{facture.last_date}}</p>
+							</div>
+						</div>
+                    	<div class="card-body">
+							<div class="table-responsive">
+								<table class="table style-1" id="ListDatatableView">
+								<thead>
+									<tr>
+										<th>N°</th>
+										<th>Code</th>
+										<th>Montant</th>
+										<th>Statut</th>
+										<th>Opérateur</th>
+										<th>Action</th>
+									</tr>
+								</thead>
+								<tbody>
+									{% for i in paiement %}
+									<tr>
+										<td>
+											<h6>{{i.id}}</h6>
+										</td>
+										<td>
+											<div>
+												<h6><a href="/sfe_facturation/static/media/{{i.uuid}}.pdf">{{i.code}}</a></h6>
+												<span>{{i.date}}</span>
+											</div>
+										</td>
+										<td>
+											<div>
+												<h6>{{i.montant}}{{i.devise}}</h6>
+												<span>{{i.mode}}</span>
+											</div>
+										</td>
+										<td>
+											<div>
+												<h6>{{i.statut}}</h6>
+												<span>-{{i.solde}}{{i.devise}}</span>
+											</div>
+										</td>
+										<td>
+											<div>
+												<span class="badge badge-info light">{{i.operateur}}</span>
+											</div>
+										</td>
+										<td>
+											<div class="d-flex action-button">
+												<button type="button" class="btn btn-danger shadow btn-xs sharp mr-1" data-toggle="modal" data-target="#modal{{i.id}}"><i class="fa fa-trash"></i></button>
+												<!-- Modal -->
+                        <div class="modal fade" id="modal{{i.id}}">
+									        <div class="modal-dialog modal-dialog-centered" style="max-width: 50vw">
+									            <div class="modal-content">
+									                <div class="modal-header">
+									                  <h5 class="modal-title">Confirmation</h5>
+									                  <button type="button" class="close" data-dismiss="modal"><span>&times;</span> </button>
+									                </div>
+									                <div class="modal-body">
+                                    <p>Voulez-vous vraiment supprimer le paiement N°<strong>{{i.code}}</strong> ? Cette action est irrersible et elle entrainera : <br><br> La suppression dudit paiement, ce qui affectera toutes les statistiques financières.</p>
+                                  </div>
+                                  <div class="modal-footer">
+													          <form id="formArticle" action="{% url 'delete_paiement' %}" method="post">
+													            <div class="mb-3">
+													            	{% csrf_token %}
+													              <input type="hidden" name="usr" value="{{usr}}">
+													              <input type="hidden" name="com" value="{{com}}">
+													              <input type="hidden" name="paiement" value="{{i.uuid}}">
+													            </div>
+													            <div class="text-end">
+													              <button type="submit" class="btn btn-danger light px-4">Supprimer</button>
+													          </form>
+													            </div>
+													          		<button type="button" class="btn btn-primary px-4 mt-2" data-dismiss="modal">Annuler</button>
+									               </div>
+									           </div>
+									       </div>
+									     	</div>
+											<a  href="/sfe_facturation/static/media/{{i.uuid}}.pdf" download="" class="btn btn-success shadow btn-xs sharp mr-1">
+												<i class="las la-download"></i>
+											</a>
+											<a href="/mails/?usr={{usr}}&com={{com}}&destination={{client.uuid}}&file={{i.uuid}}" class="btn btn-info shadow btn-xs sharp">
+												<i class="fa fa-envelope-o"></i>
+											</a>
+										</td>
+									</tr>
+								{% endfor %}
+								</tbody>
+							</table>
+						</div>
+					</div>
+                    	</div>
+                    </div>
+                </div>
+            </div>
+                    <div class="col-xl-4">
+						<div class="row">
+							<div class="col-xl-12 col-lg-6 col-sm-6">
+								<div class="card">
+		                            <div class="card-header border-0 pb-0">
+										<h2 class="card-title">Détails facture </h2>
+									</div>
+									<div class="card-body pb-0">
+										<ul class="list-group list-group-flush">
+											<li class="list-group-item d-flex px-0 justify-content-between">
+												<strong>Date</strong>
+												<span class="mb-0">{{facture.date}}</span>
+											</li>
+											<li class="list-group-item d-flex px-0 justify-content-between">
+												<strong>Client</strong>
+												<span class="mb-0">{{client.nom}}</span>
+											</li>
+											<li class="list-group-item d-flex px-0 justify-content-between">
+												<strong>Items</strong>
+												<span class="mb-0">{{facture.items}}</span>
+											</li>
+											<li class="list-group-item d-flex px-0 justify-content-between">
+												<strong>Mode</strong>
+												<span class="mb-0">{{facture.mode}}</span>
+											</li>
+											<li class="list-group-item d-flex px-0 justify-content-between">
+												<strong>Total HT</strong>
+												<span class="mb-0">{{facture.total_ht}} {{facture.devise}}</span>
+											</li>
+											<li class="list-group-item d-flex px-0 justify-content-between">
+												<strong>Total TVA</strong>
+												<span class="mb-0">{{facture.total_tva}} {{facture.devise}}</span>
+											</li>
+											<li class="list-group-item d-flex px-0 justify-content-between">
+												<strong>Total général</strong>
+												<span class="mb-0">{{facture.total}} {{facture.devise}}</span>
+											</li>
+											<li class="list-group-item d-flex px-0 justify-content-between">
+												<strong>Paiement</strong>
+												<span class="mb-0">{{facture.paiement}} {{facture.devise}}</span>
+											</li>
+											<li class="list-group-item d-flex px-0 justify-content-between">
+												<strong>Solde</strong>
+												<span class="mb-0">{{facture.solde}} {{facture.devise}}</span>
+											</li>
+										</ul>
+		                            </div>
+		                            <div class="card-footer pt-0 pb-0 text-center">
+		                                <div class="row">
+											<div class="col-4 pt-3 pb-3 border-right">
+												<h5 class="mb-1 text-primary">{{facture.total}}</h5>
+												<span style="font-size: 13px;">Total</span>
+											</div>
+											<div class="col-4 pt-3 pb-3 border-right">
+												<h5 class="mb-1 text-primary">{{facture.paiement}}</h5>
+												<span style="font-size: 13px;">Payé</span>
+											</div>
+											<div class="col-4 pt-3 pb-3">
+												<h5 class="mb-1 text-primary">{{facture.solde}}</h5>
+												<span style="font-size: 13px;">Solde</span>
+		                                    </div>
+		                                </div>
+		                            </div>
+		                        </div>
+							</div>
+							<div class="col-xl-12 col-lg-6 col-sm-6">
+								<div class="card">
+									<div class="card-body">
+										<div class="text-center">
+											<div class="my-profile">
+												<img src="{% static profil_client %}" alt="" class="rounded">
+											</div>
+											<h4 class="mt-3 font-w600 text-black mb-0 name-text">{{client.nom}}</h4>
+											<span>[{{client.type}}]</span>
+											<p class="mb-0 mt-2">Mise à jour le {{client.date}}</p>
+										</div>
+										<ul class="portofolio-social">
+											<li><a href="#"><i class="fa fa-eye"></i></a></li>
+											<li><a href="/mails/?usr={{usr}}&com={{com}}"><i class="fa fa-envelope-o"></i></a></li>
+										</ul>
+									</div>
+								</div>
+							</div>
+							<div class="col-xl-12 col-lg-6 col-sm-6">
+								<div class="card">
+		                            <div class="card-header border-0 pb-0">
+										<h2 class="card-title">Détails client</h2>
+									</div>
+									<div class="card-body pb-0">
+										<ul class="list-group list-group-flush">
+											<li class="list-group-item d-flex px-0 justify-content-between">
+												<strong>Designation</strong>
+												<span class="mb-0">{{client.nom}}</span>
+											</li>
+											<li class="list-group-item d-flex px-0 justify-content-between">
+												<strong>Type</strong>
+												<span class="mb-0">{{client.type}}</span>
+											</li>
+											<li class="list-group-item d-flex px-0 justify-content-between">
+												<strong>NIF</strong>
+											{% if client.nif == '' or client.nif == '-' %}
+												<span class="badge badge-danger light mb-0">Aucune</span>
+											{% else %}
+												<span class="mb-0">{{client.nif}}</span>
+											{% endif %}
+											</li>
+											<li class="list-group-item d-flex px-0 justify-content-between">
+												<strong>Telephone</strong>
+											{% if client.telephone == '' or client.telephone == '-' %}
+												<span class="badge badge-danger light mb-0">Aucun</span>
+											{% else %}
+												<span class="mb-0">{{client.telephone}}</span>
+											{% endif %}
+											</li>
+											<li class="list-group-item d-flex px-0 justify-content-between">
+												<strong>Email</strong>
+											{% if client.email == '' or client.email == '-' %}
+												<span class="badge badge-danger light mb-0">Aucun</span>
+											{% else %}
+												<span class="mb-0">{{client.email}}</span>
+											{% endif %}
+											</li>
+											<li class="list-group-item d-flex px-0 justify-content-between">
+												<strong>Adresse</strong>
+											{% if client.adresse == '' or client.adresse == '-' %}
+												<span class="badge badge-danger light mb-0">Aucun</span>
+											{% else %}
+												<span class="mb-0">{{client.adresse}}</span>
+											{% endif %}
+											</li>
+										</ul>
+		                            </div>
+		                            <div class="card-footer pt-0 pb-0 text-center">
+		                                <div class="row">
+											<div class="col-4 pt-3 pb-3 border-right">
+												<h5 class="mb-1 text-primary">{{client.nb_facture}}</h5>
+												<span style="font-size: 11px;">Factures</span>
+											</div>
+											<div class="col-4 pt-3 pb-3 border-right">
+												<h5 class="mb-1 text-primary">{{client.nb_paiement}}</h5>
+												<span style="font-size: 11px;">Paiement</span>
+											</div>
+											<div class="col-4 pt-3 pb-3">
+												<h5 class="mb-1 text-primary">{{client.statut_client}}</h5>
+												<span style="font-size: 11px;">Statut</span>
+		                                    </div>
+		                                </div>
+		                            </div>
+		                        </div>
+							</div>
+						</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--**********************************
+            Content body end
+        ***********************************-->
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+      const typeFacture = document.getElementById('type_facture');
+      const factureAvoirFields = document.getElementById('factureAvoirFields');
+      const modePaiement = document.getElementById('mode_paiement');
+      const compteSection = document.getElementById('compteSection');
+      const compteSelect = document.getElementById('compte');
+
+      // Afficher les champs "Nature" et "Référence"
+      typeFacture.addEventListener('change', () => {
+          const isAvoir = typeFacture.value === "FA";
+          factureAvoirFields.style.display = isAvoir ? 'block' : 'none';
+          toggleRequiredFields(factureAvoirFields, isAvoir);
+      });
+
+      // Afficher le compte si mode transfert
+      modePaiement.addEventListener('change', () => {
+          const isTransfert = modePaiement.value === "Transfert";
+          compteSection.style.display = isTransfert ? 'block' : 'none';
+          toggleRequiredFields(compteSection, isTransfert);
+      });
+
+      // Fonction pour rendre obligatoires les champs visibles
+      function toggleRequiredFields(section, isRequired) {
+          const inputs = section.querySelectorAll('input, select');
+          inputs.forEach(el => el.required = isRequired);
+      }
+  });
+  </script>
+
+{% endblock %}

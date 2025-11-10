@@ -1,0 +1,148 @@
+{% extends 'base.html' %}
+{% load static %}
+		
+{% block content %}
+    <style>
+    .mode-switch {
+      display: flex;
+      justify-content: space-around;
+      border-bottom: 2px solid #ddd;
+      margin-bottom: 15px;
+    }
+    .mode-switch button {
+      border: none;
+      background: none;
+      padding: 10px 20px;
+      font-weight: 600;
+      color: #777;
+      border-bottom: 3px solid transparent;
+      transition: all 0.2s ease;
+    }
+    .mode-switch button.active {
+      color: #00a86b;
+      border-bottom: 3px solid #00a86b;
+    }
+  </style>
+		
+		<!--**********************************
+            Content body  start
+        ***********************************-->
+        <div class="content-body">
+			<div class="container-fluid">
+				<div class="card">
+                   
+					<div class="card-header d-sm-flex d-block mb-3">
+						<div class="mr-auto mb-sm-0 mb-3">
+							<h4 class="card-title mb-2">Tous les paiements </h4>
+							<span class="ml-1" style="font-size: 12px;">Dernière mise à jour le {{maj}}</span>
+						</div>
+						<div class="input-group search-area right d-lg-inline-flex d-none">
+								<input type="text" class="form-control" placeholder="Rechercher un paiement">
+								<div class="input-group-append">
+									<span class="input-group-text">
+										<a href="javascript:void(0)">
+											<i class="flaticon-381-search-2"></i>
+										</a>
+									</span>
+								</div>
+						</div>
+						<a href="javascript:void(0);" class="btn btn-info light mr-3 ml-3"><i class="las la-filter mr-2"></i>Filtre</a>
+						<a href="/facturation/?usr={{usr}}&com={{com}}" class="btn btn-primary mb-2"><i class="las la-list mr-2"></i>Toutes les commandes</a>
+					</div>
+				</div>
+				<div class="card">
+					<div class="card-body">
+						<div class="table-responsive">
+							<table class="table style-1" id="ListDatatableView">
+								<thead>
+									<tr>
+										<th style="font-size: 12px;">#</th>
+										<th style="font-size: 12px;">Client</th> <!--Profil, nom et type -->
+										<th style="font-size: 12px;">Commande</th> <!--Numéro et date -->
+										<th style="font-size: 12px;">Type</th> <!-- Type facture et nature si avoir -->
+										<th style="font-size: 12px;">Paiemnt</th> <!-- Mode et date paiement -->
+										<th style="font-size: 12px;">Montant</th> <!-- CDF & USD en se basant sur le taux -->
+										<th style="font-size: 12px;">Compte</th> <!-- Opérateur compte et Numéro -->
+										<th style="font-size: 12px;">statut</th> <!-- Solde ou accompte -->
+										<th style="font-size: 12px;">Opérateur</th> <!-- Utilisateur -->
+										<th style="font-size: 12px;">Action</th>
+									</tr>
+								</thead>
+								<tbody>
+								{% for i in factures %}
+									<tr>
+										<td>
+											<h6>{{i.id}}</h6>
+										</td>
+										<td>
+											<div class="media style-1">
+												<a href="#"><img src="{% static i.profil_client %}" class="img-fluid mr-3" alt=""></a>
+												<div class="media-body">
+													<h6>{{i.client}}</h6>
+													<span>{{i.type_client}}</span>
+												</div>
+											</div>
+										</td>
+										<td>
+											<div>
+													<h6 class="text-primary">{{i.date_commande}}</h6>
+													<span>{{i.commande}}</span>
+											</div>
+										</td>
+										<!-- ] -->
+										<td>
+											<div>
+												<h6>{{i.type}}</h6>
+												<span>{{i.nature}}</span>
+											</div>
+										</td>
+										<td>
+											<div>
+												<h6 class="text-primary">{{i.date_paiement}}</h6>
+												<span>{{i.mode}}</span>
+											</div>
+										</td>
+										<td>
+											<div>
+													<h6>{{i.montant_cdf}}fc</h6>
+													<span>{{i.montant_usd}}</span>
+											</div>
+										</td>
+										<td>
+											{% if i.numero_compte == '' and i.operateur_compte == '' %}
+													<span class="badge badge-danger light">Aucun</span>
+											{% else %}
+													<h6>{{i.operateur_compte}}</h6>
+													<span>{{i.numero_compte}}</span>
+											{% endif %}
+										</td>
+										<td>
+											{% if i.statut == 'Solde' %}
+												<span class="badge badge-danger light">Solde</span>
+											{% else %}
+												<h6>{{i.statut}}</h6>
+												<span>{{i.solde}}fc</span>
+											{% endif %}
+										</td>
+										<td>
+												<span class="badge badge-info light">{{i.operateur}}</span>
+										</td>
+										<td>
+											<div class="d-flex action-button">
+												<div class="d-flex">
+													<a href="#" class="btn btn-primary shadow btn-xs sharp mr-1"><i class="fa fa-pencil"></i></a>
+													<a href="#" class="btn btn-danger shadow btn-xs sharp"><i class="fa fa-trash"></i></a>
+													<a href="../../static/media/{{i.uuid}}.pdf" class="nav-link text-center ml-2 btn btn-xs px-2 py-1 light btn-success"><i class="las la-download"></i></a>
+	                      </div>
+										</td>
+									</tr>
+								{% endfor %}
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+{% endblock %}

@@ -1,0 +1,380 @@
+{% extends 'base.html' %}
+{% load static %}
+		
+{% block content %}
+    <style>
+    .mode-switch {
+      display: flex;
+      justify-content: space-around;
+      border-bottom: 2px solid #ddd;
+      margin-bottom: 15px;
+    }
+    .mode-switch button {
+      border: none;
+      background: none;
+      padding: 10px 20px;
+      font-weight: 600;
+      color: #777;
+      border-bottom: 3px solid transparent;
+      transition: all 0.2s ease;
+    }
+    .mode-switch button.active {
+      color: #00a86b;
+      border-bottom: 3px solid #00a86b;
+    }
+  </style>
+		
+		<!--**********************************
+            Content body  start
+        ***********************************-->
+        <div class="content-body">
+			<div class="container-fluid">
+				<div class="card">
+                   
+					<div class="card-header d-sm-flex d-block">
+						<div class="mr-auto mb-sm-0 mb-3">
+							<h4 class="card-title mb-2"><a href="/articles/?usr={{usr}}&com={{com}}" class="text-black">Tous les articles </a></h4>
+							<span class="ml-1" style="font-size: 12px;">Dernière mise à jour le {{maj}}</span>
+						</div>
+						<div class="input-group search-area right d-lg-inline-flex d-none">
+								<input type="text" class="form-control" placeholder="Rechercher un article">
+								<div class="input-group-append">
+									<span class="input-group-text">
+										<a href="javascript:void(0)">
+											<i class="flaticon-381-search-2"></i>
+										</a>
+									</span>
+								</div>
+							</div>
+						<a href="javascript:void(0);" class="btn btn-info light mr-3 ml-3"><i class="las la-filter mr-2"></i>Filtre</a>
+						<!-- <a href="javascript:void(0);" class="btn btn-info">+ Add Customer</a> -->
+                        <button type="button" class="btn btn-primary mb-2" data-toggle="modal" data-target="#md"><i class="las la-plus mr-2"></i>
+                            Ajouter un article 
+                        </button>
+                        <!-- modale  -->
+                         <div class="modal fade" id="md">
+                            <div class="modal-dialog modal-dialog-centered" style="margin-right: 0;">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title">Nouvel article</h5>
+                                         <button type="button" class="close" data-dismiss="modal"><span>&times;</span> </button>
+                                    </div>
+                                    <div class="modal-body">
+                                
+       
+          <form id="formArticle" action="{% url 'article' %}" method="post"> 
+  {% csrf_token %}
+  <input type="hidden" name="usr" value="{{usr}}">
+  <input type="hidden" name="com" value="{{com}}">
+  <div class="form-row">
+	  <div class="form-group col-md-6">
+	    <label class="form-label">Désignation</label>
+	    <input type="text" name="nom" class="form-control" id="designation" placeholder="Ex: Coca Cola" required>  
+	  </div>
+
+	  <div class="form-group col-md-6">
+	    <label class="form-label">Mesure</label>
+	    <input type="text" name="mesure" class="form-control" id="mesure" placeholder="Ex: 33 CL / 4 Kilos / 1h">
+	  </div>
+	</div>
+
+
+	<div class="form-row">
+    <div class="form-group col-md-6">
+	    <label class="form-label">Type</label>
+	    <select name="type" class="form-control default-select" id="type" required>
+	      <option value="">-- Sélectionner --</option>
+	      <option value="BIE">[BIE] Bien</option>
+	      <option value="SER">[SER] Service</option>
+	    </select>
+	  </div>
+
+	  <div class="form-group col-md-6">
+	    <label class="form-label">Catégorie</label>
+	    <div class="d-flex">
+	    	<select name="cat" class="form-control default-select" id="categorie">
+		      <option value="">-- Sélectionner --</option>
+		      {% for i in categorie %}
+		        <option value="{{i.Uuid}}">{{i.Libelle}}</option>
+		      {% endfor %}
+		    </select>
+		    <button type="button" class="text-center ml-2 btn btn-xs px-1 py-1 light btn-success" data-toggle="modal" data-target="#cat">
+		      <i class="las la-plus" style="font-size: 18px;"></i>
+		    </button>
+	    </div>
+	  </div>
+	</div>
+
+	<div class="form-row">
+    <div class="form-group col-md-6">
+	    <label class="form-label">Groupe</label>
+	    <select name="groupe" class="form-control default-select" id="groupe" required>
+	      <option value="">-- Sélectionner --</option>
+	      {% for i in groupe %}
+	        <!-- On stocke le taux dans un attribut data-taux -->
+	        <option value="{{i.Code}}" data-taux="{{i.Taux}}">{{i.Designation}} {{i.Taux}}%</option>
+	      {% endfor %}
+	    </select>
+	  </div>
+
+	  <div class="form-group col-md-6">
+	    <label class="form-label">Devise</label>
+	    <select name="devise" class="form-control default-select" id="devise" required>
+	      <option value="USD">USD</option>
+	      <option value="CDF">CDF</option>
+	    </select>
+	  </div>
+	</div>
+
+  <div class="mb-3">
+    <label class="form-label">Mode</label>
+    <select name="mode" class="form-control default-select" id="mode" required>
+	      <option value="TTC">TTC</option>
+	      <option value="HT">HT</option>
+	  </select>
+  </div>
+
+  <div class="row">
+    <div class="col-md-6 mb-3">
+      <label class="form-label">Prix [HT]</label>
+      <input name="prixht" type="number" step="0.01" class="form-control" id="prixHT" placeholder="0.00">
+    </div>
+    <div class="col-md-6 mb-3">
+      <label class="form-label">Prix [TTC]</label>
+      <input name="prixttc" type="number" step="0.01" class="form-control" id="prixTTC" placeholder="0.00" readonly>
+    </div>
+  </div>
+
+  <div class="form-check mb-3">
+            <input class="form-check-input" type="checkbox" id="paiement" name="paiement">
+            <label class="form-check-label" for="paiement">Taxe specifique</label>
+          </div>
+
+          <div id="paiementSection" class="border p-3 mb-3" style="display:none;">
+            <div class="form-row">
+						  <div class="form-group col-md-6">
+						    <label class="form-label">Désignation</label>
+						    <input type="text" name="specifique" class="form-control" id="specifique">  
+						  </div>
+
+						  <div class="form-group col-md-6">
+						    <label class="form-label">Taux</label>
+						    <input type="number" name="taux" class="form-control" id="taux">
+						  </div>
+						</div>
+          </div>
+
+  <div class="text-end">
+    <button type="submit" class="btn btn-primary px-4">AJOUTER</button>
+  </div>
+</form>
+
+                                    </div>
+                                </div>
+                            </div>
+
+            
+                      </div>
+          <div class="modal fade" id="cat">
+              <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title">Nouvelle Catégorie</h5>
+                    <a href="/articles/?usr={{usr}}&com={{com}}" class="close"><span>&times;</span> </a>
+                  </div>
+                <div class="modal-body">
+			          <form id="formArticle" action="{% url 'categorie' %}" method="post">
+			            <div class="mb-3">
+			            	{% csrf_token %}
+			              <label class="form-label">Libellé</label>
+			              <input type="hidden" name="usr" value="{{usr}}">
+			              <input type="hidden" name="com" value="{{com}}">
+			              <input type="text" name="lib" class="form-control" id="lib" placeholder="Ex: Boisson" required>
+			            </div>
+			            <div class="text-end">
+			              <button type="submit" class="btn btn-primary px-4">AJOUTER</button>
+			              <a href="/articles/?usr={{usr}}&com={{com}}" class="btn btn-light px-4">ANNULER</a>
+			            </div>
+			          </form>
+               </div>
+           </div>
+       </div>
+
+            
+                      </div>
+                       <script>
+  const prixHT = document.getElementById('prixHT');
+  const prixTTC = document.getElementById('prixTTC');
+  const groupeSelect = document.getElementById('groupe');
+
+  // Fonction de calcul du prix TTC
+  function calculerTTC() {
+    const ht = parseFloat(prixHT.value) || 0;
+    const selectedOption = groupeSelect.options[groupeSelect.selectedIndex];
+    const taux = parseFloat(selectedOption.dataset.taux) || 0;
+    
+    const ttc = ht + (ht * taux * 0.01);
+    prixTTC.value = ttc.toFixed(2);
+  }
+
+  // Événements : recalcul à chaque changement
+  prixHT.addEventListener('input', calculerTTC);
+  groupeSelect.addEventListener('change', calculerTTC);
+
+  // 🔹 Section commentaire (checkbox)
+  const paiementCheckbox = document.getElementById('paiement');
+  const paiementSection = document.getElementById('paiementSection');
+  paiementCheckbox.addEventListener('change', () => {
+    paiementSection.style.display = paiementCheckbox.checked ? 'block' : 'none';
+  });
+
+  // Fonction pour rendre obligatoires les champs visibles
+  function toggleRequiredFields(section, isRequired) {
+    const inputs = section.querySelectorAll('input, select');
+    inputs.forEach(el => el.required = isRequired);
+      }
+</script>
+
+
+</div>
+</div>
+	{% block article %}
+	<div class="card">			
+					<div class="card-body">
+						<div class="table-responsive">
+							<table class="table style-1" id="ListDatatableView">
+								<thead>
+									<tr>
+										<th style="font-size: 12px;">N°</th>
+										<th style="font-size: 12px;">Designation</th>
+										<th style="font-size: 12px;">Quantité</th>
+										<th style="font-size: 12px;">Goupe</th>
+										<th style="font-size: 12px;">prix [HT&TTC] </th>
+										<th style="font-size: 12px;">Dernière entrée</th>
+										<th style="font-size: 12px;">Taxe spécifique</th>
+										<th style="font-size: 12px;">Categorie</th>
+										<th style="font-size: 12px;">Action</th>
+									</tr>
+								</thead>
+								<tbody>
+								{% for i in articles %}
+									<tr>
+										<td>
+											<h6>{{i.id}}</h6>
+										</td>
+										<td>
+											<div class="media style-1">
+												<a href="/detail_article/?usr={{usr}}&com={{com}}&article={{i.uuid}}"><img src="{% static i.photo %}" class="img-fluid mr-3" alt=""></a>
+												<div class="media-body">
+													<h6>{{i.nom}}</h6>
+													<span>[{{i.type}}]</span>
+												</div>
+											</div>
+										</td>
+										<td>
+											<div>
+												{% if i.quantite == '-' and i.mesure == '' %}
+													<span class="badge badge-danger light">Aucune</span>
+												{% else %}
+													<h6>{{i.quantite}}</h6>
+													<span>{{i.mesure}}</span>
+												{% endif %}
+											</div>
+										</td>
+										<!-- ] -->
+										<td>
+											<div>
+												<h6>[{{i.code_groupe}}]{{i.groupe}}</h6>
+												<span>{{i.taux_groupe}} %</span>
+											</div>
+										</td>
+										<td>
+											<div>
+												<h6>{{i.prixht}}{{i.devise}}</h6>
+												<span>{{i.prixttc}}{{i.devise}}</span>
+											</div>
+										</td>
+										<td>
+											<div>
+												{% if i.derniere_date == '' and i.derniere_quantite == '' %}
+													<span class="badge badge-danger light">Aucune</span>
+												{% else %}
+													<h6 class="text-primary">{{i.derniere_date}}</h6>
+													<span>{{i.derniere_quantite}}</span>
+												{% endif %}
+											</div>
+										</td>
+										<td>
+											{% if i.prix_taxe == '' and i.taux_taxe == '' %}
+													<span class="badge badge-danger light">Aucune</span>
+											{% else %}
+													<h6>{{i.prix_taxe}}{{i.devise}}</h6>
+													<span>{{i.taux_taxe}} %</span>
+											{% endif %}
+										</td>
+										<td>
+											{% if i.categorie == '' %}
+												<span class="badge badge-danger light">Aucune</span>
+											{% else %}
+												<span class="badge badge-success light">{{i.categorie}}</span></td>
+											{% endif %}
+										</td>
+										<td>
+											<div class="d-flex">
+												<a href="/modifier_article/?usr={{usr}}&com={{com}}&article={{i.uuid}}" class="btn btn-primary shadow btn-xs sharp mr-1"><i class="fa fa-pencil"></i></a>
+												<button type="button" class="btn btn-danger shadow btn-xs sharp" data-toggle="modal" data-target="#modal{{i.id}}"><i class="fa fa-trash"></i></button>
+												<!-- Modal -->
+                        <div class="modal fade" id="modal{{i.id}}">
+									          <div class="modal-dialog modal-dialog-centered" style="max-width: 50vw">
+									              <div class="modal-content">
+									                <div class="modal-header">
+									                  <h5 class="modal-title">Confirmation</h5>
+									                  <button type="button" class="close" data-dismiss="modal"><span>&times;</span> </button>
+									                </div>
+									                <div class="modal-body">
+                                    <p>Voulez-vous vraiment supprimer l'article <strong>{{i.nom}}</strong> ? Cette action est irrersible et elle entrainera : <br><br> La suppression dudit article dans tous les devis et factures, ce qui affectera toutes les statistiques financières.</p>
+                                  </div>
+                                  <div class="modal-footer">
+													          <form id="formArticle" action="{% url 'delete_article' %}" method="post">
+													            <div class="mb-3">
+													            	{% csrf_token %}
+													              <input type="hidden" name="usr" value="{{usr}}">
+													              <input type="hidden" name="com" value="{{com}}">
+													              <input type="hidden" name="article_id" value="{{i.uuid}}">
+													            </div>
+													            <div class="text-end">
+													              <button type="submit" class="btn btn-danger light px-4">Supprimer</button>
+													          </form>
+													            </div>
+													          		<button type="button" class="btn btn-primary px-4 mt-2" data-dismiss="modal">Annuler</button>
+									               </div>
+									           </div>
+									       </div>
+									     </div>
+                        <a href="#" role="button" class="nav-link text-center ml-2 btn btn-xs px-2 py-1 light btn-success" data-toggle="dropdown">
+													<i class="las la-plus"></i>
+												</a>
+												<div class="dropdown-menu dropdown-menu-right">
+                          <a href="/stock/?usr={{usr}}&com={{com}}" class="dropdown-item ai-icon">
+                              <i class="flaticon-381-network text-primary"></i>
+                              <span class="ml-2">Nouveau stock</span>
+                          </a>
+                          <a href="/facturation/?usr={{usr}}&com={{com}}" class="dropdown-item ai-icon">
+                              <i class="flaticon-044-file text-info"></i>
+                              <span class="ml-2">Facture </span>
+                          </a>
+                      	</div>	
+											</div>
+										</td>
+									</tr>
+								{% endfor %}
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+			{% endblock %}
+			</div>
+		</div>
+
+{% endblock %}

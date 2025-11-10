@@ -1,0 +1,388 @@
+{% extends 'liste-stock.html' %}
+{% load static %}
+		
+
+{% block stock %}
+<div class="row">
+					<div class="col-xl-9 col-xxl-8">
+						<div class="row">
+							<div class="col-xl-4 col-xxl-12">
+								<div class="card">
+									<div class="card-header pb-0 d-block d-sm-flex flex-wrap border-0 align-items-center">
+										<div class="mr-auto mb-3">
+											<h4 class="fs-20 text-black">Statistiques générales</h4>
+											<p class="mb-0 fs-12">Dernière mise à jour le 12/08/2023</p>
+										</div>
+									</div>
+									<div class="card-body pb-0 pt-sm-3 pt-0">
+										<div class="row sp20 mb-4 align-items-center">
+											<div class="col-lg-4 col-xxl-4 col-sm-4 d-flex flex-wrap align-items-center">
+												<div class="px-2 info-group">
+													<p class="fs-18 mb-1">Total</p>
+													<h2 class="fs-28 font-w600 text-black"><span class="text-success mr-1">{{stock.devise}} {{stock.total}}</span><svg width="14" height="14" viewbox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+													<path d="M0 7L7.00001 -8.77983e-06L14 7H7.00001H0Z" fill="#2BC155"></path>
+													</svg></h2>
+												</div>
+											</div>
+											<div class="d-flex col-lg-8 col-xxl-8 co-sm-8 align-items-center mt-sm-0 mt-3 justify-content-end">
+												<div class="px-2 info-group">
+													<p class="fs-14 mb-1">Prix d'achat</p>
+													<h3 class="fs-20 font-w600">{{stock.devise}} {{stock.prix}}
+													</h3>
+												</div>
+												<div class="px-2 info-group">
+													<p class="fs-14 mb-1">Quantité</p>
+													<h3 class="fs-20 font-w600 text-black">{{stock.quantite}}</h3>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="col-xl-8 col-xxl-12">
+								<div class="card">
+									<div class="card-header pb-2 d-block d-sm-flex flex-wrap border-0">
+										<div class="mb-3">
+											<h4 class="fs-20 text-black">Historique de stock du fournisseur</h4>
+										{% if acteur == '' %}
+											<p class="mb-0 fs-13">Dernière mise à jour le 00/00/0000</p>
+										{% else %}
+											<p class="mb-0 fs-13">Dernière mise à jour le {{acteur.last_stock}}</p>
+										{% endif %}
+										</div>
+									</div>
+									<div class="card-body tab-content p-0">
+										<div class="tab-pane active show fade">
+											<div class="table-responsive">
+												<table class="table table-hover table-responsive-sm">
+													<tbody>
+														<tr>
+															<td><span class="ml-2">DATE</span></td>
+															<td><span>ARTICLE</span></td>
+															<td><span>PRIX</span></td>
+															<td><span>QUANTITE</span></td>
+															<td><span>TOTAL</span></td>
+														</tr>
+													{% for i in historique_fournisseur %}
+														<tr>
+															<td>
+																<span class="text-black ml-2"><a href="/details_stock/?usr={{usr}}&com={{com}}&stock={{i.uuid}}">{{i.date}}</a></span>
+															</td>
+															<td>
+																<span class="text-black">{{i.article}}</span>
+															</td>
+															<td>
+																<span class="text-black">{{i.prix}} {{i.devise}}</span>
+															</td>
+															<td>
+																<span class="text-black">{{i.quantite}}</span>
+															</td>
+															<td>
+																<span class="text-black">{{i.total}} {{i.devise}}</span>
+															</td>
+														</tr>
+													{% endfor %}
+													</tbody>
+												</table>
+											</div>
+										</div>
+									</div>
+								</div>	
+							</div>
+									<div class="col-xl-8 col-xxl-12">
+										<div class="card">
+											<div class="card-header pb-2 d-block d-sm-flex flex-wrap border-0">
+												<div class="mb-3">
+													<h4 class="fs-20 text-black">Historique de stock de l'article</h4>
+													<p class="mb-0 fs-13">Dernière mise à jour le {{article.last_stock}}</p>
+												</div>
+											</div>
+											<div class="card-body p-3">
+												<div class="table-responsive">
+													<table class="table text-center bg-primary-hover tr-rounded order-tbl">
+														<thead>
+															<tr>
+																<th class="text-left">#</th>
+																<th class="text-left">Date</th>
+																<th class="text-left">Fournisseur</th>
+																<th class="text-center">Prix</th>
+																<th class="text-center">Quantité</th>
+																<th class="text-right">Total</th>
+															</tr>
+														</thead>
+														<tbody>
+														{% for i in stock_article %}
+															<tr>
+																<td class="text-left"><a href="/details_stock/?usr={{usr}}&com={{com}}&stock={{i.uuid}}">{{i.id}}</a></td>
+																<td class="text-left">{{i.date}}</td>
+															{% if i.fournisseur == '' %}
+																<td><span class="badge badge-danger light mb-0">Aucun</span></td>
+															{% else %}
+																<td class="text-left">{{i.fournisseur}}</td>
+															{% endif %}
+																<td class="text-left">{{i.prix}} {{i.devise}}</td>
+																<td class="text-center">{{i.quantite}}</td>
+																<td class="text-left">{{i.total}} {{i.devise}}</td>
+															</tr>
+														{% endfor %}
+														</tbody>
+													</table>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							
+							
+					</div>
+					<div class="col-xl-3 col-xxl-4">
+						<div class="row">
+							<div class="col-xl-12 col-lg-6 col-sm-6">
+								<div class="card">
+		                            <div class="card-header border-0 pb-0">
+										<h2 class="card-title">Détails stock </h2>
+									</div>
+									<div class="card-body pb-0">
+										<ul class="list-group list-group-flush">
+											<li class="list-group-item d-flex px-0 justify-content-between">
+												<strong>Date</strong>
+												<span class="mb-0">{{stock.date}}</span>
+											</li>
+											<li class="list-group-item d-flex px-0 justify-content-between">
+												<strong>Article</strong>
+												<span class="mb-0">{{stock.article}}</span>
+											</li>
+											<li class="list-group-item d-flex px-0 justify-content-between">
+												<strong>Prix d'achat</strong>
+												<span class="mb-0">{{stock.prix}} {{stock.devise}}</span>
+											</li>
+											<li class="list-group-item d-flex px-0 justify-content-between">
+												<strong>Quantité</strong>
+												<span class="mb-0">{{stock.quantite}}</span>
+											</li>
+											<li class="list-group-item d-flex px-0 justify-content-between">
+												<strong>Total</strong>
+												<span class="mb-0">{{stock.total}} {{stock.devise}}</span>
+											</li>
+											<li class="list-group-item d-flex px-0 justify-content-between">
+												<strong>Fournisseur</strong>
+											{% if stock.fournisseur == '' %}
+												<span class="badge badge-danger light mb-0">Aucun</span>
+											{% else %}
+												<span class="mb-0">{{stock.fournisseur}}</span>
+											{% endif %}
+											</li>
+										</ul>
+		                            </div>
+		                            <div class="card-footer pt-0 pb-0 text-center">
+		                                <div class="row">
+											<div class="col-4 pt-3 pb-3 border-right">
+												<h3 class="mb-1 text-primary">{{stock.prix}}</h3>
+												<span style="font-size: 13px;">Prix</span>
+											</div>
+											<div class="col-4 pt-3 pb-3 border-right">
+												<h3 class="mb-1 text-primary">{{stock.quantite}}</h3>
+												<span style="font-size: 13px;">Qte</span>
+											</div>
+											<div class="col-4 pt-3 pb-3">
+												<h3 class="mb-1 text-primary">{{stock.total}}</h3>
+												<span style="font-size: 13px;">Total</span>
+		                                    </div>
+		                                </div>
+		                            </div>
+		                        </div>
+							</div>
+							<div class="col-xl-12 col-lg-6 col-sm-6">
+								<div class="card">
+									<div class="card-body">
+										<div class="text-center">
+											<div class="my-profile">
+												<img src="{% static article.photo %}" alt="" class="rounded">
+											</div>
+											<h4 class="mt-3 font-w600 text-black mb-0 name-text">{{article.nom}}</h4>
+											<span>[{{article.type}}]</span>
+											<p class="mb-0 mt-2">Mise à jour le {{article.date}}</p>
+										</div>
+										<ul class="portofolio-social">
+											<li><a href="/detail_article/?usr={{usr}}&com={{com}}&article={{article.uuid}}"><i class="fa fa-eye"></i></a></li>
+										</ul>
+									</div>
+								</div>
+							</div>
+							<div class="col-xl-12 col-lg-6 col-sm-6">
+								<div class="card">
+		                            <div class="card-header border-0 pb-0">
+										<h2 class="card-title">Détails article</h2>
+									</div>
+									<div class="card-body pb-0">
+										<ul class="list-group list-group-flush">
+											<li class="list-group-item d-flex px-0 justify-content-between">
+												<strong>Designation</strong>
+												<span class="mb-0">{{article.nom}}</span>
+											</li>
+											<li class="list-group-item d-flex px-0 justify-content-between">
+												<strong>Type</strong>
+											{% if article.type == 'BIE' %}
+												<span class="mb-0">Bien</span>
+											{% else %}
+												<span class="mb-0">Service</span>
+											{% endif %}
+											</li>
+											<li class="list-group-item d-flex px-0 justify-content-between">
+												<strong>Categorie</strong>
+											{% if article.categorie == '' %}
+												<span class="badge badge-danger light mb-0">Aucune</span>
+											{% else %}
+												<span class="mb-0">{{article.categorie}}</span>
+											{% endif %}
+											</li>
+											<li class="list-group-item d-flex px-0 justify-content-between">
+												<strong>Mesure</strong>
+											{% if article.mesure == '' %}
+												<span class="badge badge-danger light mb-0">Aucune</span>
+											{% else %}
+												<span class="mb-0">{{article.mesure}}</span>
+											{% endif %}
+											</li>
+											<li class="list-group-item d-flex px-0 justify-content-between">
+												<strong>Prix</strong>
+												<span class="mb-0">{{article.prixht}}{{article.devise}}</span>
+											</li>
+											<li class="list-group-item d-flex px-0 justify-content-between">
+												<strong>Groupe</strong>
+												<span class="mb-0">[{{article.code_groupe}}] {{article.groupe}} {{article.taux_groupe}}%</span>
+											</li>
+											<li class="list-group-item d-flex px-0 justify-content-between">
+												<strong>Prix TTC</strong>
+												<span class="mb-0">{{article.prixttc}}{{article.devise}}</span>
+											</li>
+											<li class="list-group-item d-flex px-0 justify-content-between">
+												<strong>Taxe specifique</strong>
+											{% if article.taux_taxe == '' %}
+												<span class="badge badge-danger light mb-0">Aucune</span>
+											{% else %}
+												<span class="mb-0">{{article.taux_taxe}}%</span>
+											{% endif %}
+											</li>
+											<li class="list-group-item d-flex px-0 justify-content-between">
+												<strong>Mode</strong>
+												<span class="mb-0">{{article.mode}}</span>
+											</li>
+										</ul>
+		                            </div>
+		                            <div class="card-footer pt-0 pb-0 text-center">
+		                                <div class="row">
+											<div class="col-4 pt-3 pb-3 border-right">
+												<h3 class="mb-1 text-primary">{{article.stock}}</h3>
+												<span style="font-size: 13px;">Entrées</span>
+											</div>
+											<div class="col-4 pt-3 pb-3 border-right">
+												<h3 class="mb-1 text-primary">{{article.facture}}</h3>
+												<span style="font-size: 13px;">Factures</span>
+											</div>
+											<div class="col-4 pt-3 pb-3">
+												<h3 class="mb-1 text-primary">{{article.devis}}</h3>
+												<span style="font-size: 13px;">Devis</span>
+		                                    </div>
+		                                </div>
+		                            </div>
+		                        </div>
+							</div>
+						{% if not stock.fournisseur == '' %}
+							<div class="col-xl-12 col-lg-6 col-sm-6">
+								<div class="card">
+		                            <div class="card-header border-0 pb-0">
+										<h2 class="card-title">Détails fournisseur</h2>
+									</div>
+									<div class="card-body pb-0">
+										<ul class="list-group list-group-flush">
+											<li class="list-group-item d-flex px-0 justify-content-between">
+												<strong>Designation</strong>
+												<span class="mb-0">{{acteur.nom}}</span>
+											</li>
+											<li class="list-group-item d-flex px-0 justify-content-between">
+												<strong>Type</strong>
+												<span class="mb-0">{{acteur.type}}</span>
+											</li>
+											<li class="list-group-item d-flex px-0 justify-content-between">
+												<strong>NIF</strong>
+											{% if acteur.nif == '' %}
+												<span class="badge badge-danger light mb-0">Aucun</span>
+											{% else %}
+												<span class="mb-0">{{acteur.nif}}</span>
+											{% endif %}
+											</li>
+											<li class="list-group-item d-flex px-0 justify-content-between">
+												<strong>Téléphone</strong>
+											{% if acteur.num == '' %}
+												<span class="badge badge-danger light mb-0">Aucun</span>
+											{% else %}
+												<span class="mb-0">{{acteur.num}}</span>
+											{% endif %}
+											</li>
+											<li class="list-group-item d-flex px-0 justify-content-between">
+												<strong>Email</strong>
+											{% if acteur.email == '' %}
+												<span class="badge badge-danger light mb-0">Aucun</span>
+											{% else %}
+												<span class="mb-0">{{acteur.email}}</span>
+											{% endif %}
+											</li>
+											<li class="list-group-item d-flex px-0 justify-content-between">
+												<strong>Adresse</strong>
+												<span class="mb-0">{{acteur.adresse}}</span>
+											</li>
+										</ul>
+		                            </div>
+		                            <div class="card-footer pt-0 pb-0 text-center">
+		                                <div class="row">
+											<div class="col-4 pt-3 pb-3 border-right">
+												<h3 class="mb-1 text-primary">{{acteur.stock}}</h3>
+												<span style="font-size: 13px;">Entrées</span>
+											</div>
+											<div class="col-4 pt-3 pb-3 border-right">
+												<h3 class="mb-1 text-primary">{{acteur.quantite}}</h3>
+												<span style="font-size: 13px;">Quantité</span>
+											</div>
+											<div class="col-4 pt-3 pb-3">
+												<h3 class="mb-1 text-primary">{{acteur.total}}</h3>
+												<span style="font-size: 13px;">Total</span>
+		                                    </div>
+		                                </div>
+		                            </div>
+		                        </div>
+							</div>
+						{% endif %}
+							<div class="col-xl-12 col-lg-6 col-sm-6">
+								<div class="card">
+									<div class="card-body">
+								        <div class="text-center">
+								          <div class="my-profile">
+								            <img src="{% static stock.photo_fournisseur %}" alt="" class="rounded">
+								          </div>
+								      {% if stock.fournisseur == '' %}
+								          <br>
+								          <span class="mt-4 badge badge-danger light">Aucun fournisseur</span>
+								        </div>
+								      {% else %}
+								          <h4 class="mt-3 font-w600 text-black mb-0 name-text">{{acteur.nom}}</h4>
+								          <span>{{acteur.type}}</span>
+								          <p class="mb-0 mt-2">Dernière mise à jour le {{acteur.date}}</p>
+								        </div>
+								        <ul class="portofolio-social">
+								          <li><a href="/details_fournisseur/?usr={{usr}}&com={{com}}&acteur={{acteur.uuid}}"><i class="fa fa-eye"></i></a></li>
+								          <li><a href="/mails/?usr={{usr}}&com={{com}}&destination={{acteur.uuid}}"><i class="fa fa-envelope-o"></i></a></li>
+								        </ul>
+								      {% endif %}
+								      </div>
+								    </div>
+								</div>
+							</div>	
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+{% endblock %}

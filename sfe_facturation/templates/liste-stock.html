@@ -1,0 +1,234 @@
+{% extends 'base.html' %}
+{% load static %}
+		
+{% block content %}
+    <style>
+    .mode-switch {
+      display: flex;
+      justify-content: space-around;
+      border-bottom: 2px solid #ddd;
+      margin-bottom: 15px;
+    }
+    .mode-switch button {
+      border: none;
+      background: none;
+      padding: 10px 20px;
+      font-weight: 600;
+      color: #777;
+      border-bottom: 3px solid transparent;
+      transition: all 0.2s ease;
+    }
+    .mode-switch button.active {
+      color: #00a86b;
+      border-bottom: 3px solid #00a86b;
+    }
+  </style>
+		
+		<!--**********************************
+            Content body  start
+        ***********************************-->
+        <div class="content-body">
+			<div class="container-fluid">
+				<div class="card">
+                   
+					<div class="card-header d-sm-flex d-block">
+						<div class="mr-auto mb-sm-0 mb-3">
+							<h4 class="card-title mb-2"><a class="text-black" href="/stock/?usr={{usr}}&com={{com}}">Tout les stocks </a></h4>
+							<span class="ml-1" style="font-size: 12px;">Dernière mise à jour le {{maj}}</span>
+						</div>
+						<div class="input-group search-area right d-lg-inline-flex d-none">
+								<input type="text" class="form-control" placeholder="Recherche">
+								<div class="input-group-append">
+									<span class="input-group-text">
+										<a href="javascript:void(0)">
+											<i class="flaticon-381-search-2"></i>
+										</a>
+									</span>
+								</div>
+							</div>
+						<a href="javascript:void(0);" class="btn btn-info light mr-3 ml-3"><i class="las la-filter mr-2"></i>Filtre</a>
+						<!-- <a href="javascript:void(0);" class="btn btn-info">+ Add Customer</a> -->
+                        <button type="button" class="btn btn-primary mb-2" data-toggle="modal" data-target="#md"><i class="las la-plus mr-2"></i>
+                            Ajouter un stock 
+                        </button>
+                        <!-- modale  -->
+                         <div class="modal fade" id="md">
+                            <div class="modal-dialog modal-dialog-centered" style="margin-right: 0;">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title">Nouveau stock</h5>
+                                         <button type="button" class="close" data-dismiss="modal"><span>&times;</span> </button>
+                                    </div>
+                                    <div class="modal-body">
+                                    
+       
+          <form id="formArticle" action="{% url 'nouveau_stock' %}" method="post">
+          	{% csrf_token %}
+						<input type="hidden" name="usr" value="{{usr}}">
+			      <input type="hidden" name="com" value="{{com}}">
+			      <div class="form-row">
+					    <div class="form-group col-md-6">
+					      <label class="form-label">Article</label>
+	              <select class="form-control default-select" id="type" name="article" required>
+	                <option value="">-- Sélectionner --</option>
+	              {% for i in articles %}
+	                <option value="{{i.Uuid}}"> {{i.Designation}} </option>
+	              {% endfor %}
+	              </select>
+					    </div>
+
+					    <div class="form-group col-md-6">
+					      <label class="form-label">Fournisseur</label>
+	              <select class="form-control default-select" id="groupe" name="fournisseur">
+	                <option value="">-- Sélectionner --</option>
+	              {% for i in fournisseurs %}
+	                <option value="{{i.Uuid}}"> {{i.Designation}} </option>
+	              {% endfor %}
+	              </select>
+					    </div>
+					  </div>
+
+					  <div class="mb-3">
+					    <label class="form-label">Devise</label>
+					    <select name="devise" class="form-control default-select" id="devise" required>
+						      <option>USD</option>
+						      <option>CDF</option>
+						  </select>
+					  </div>
+
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Prix unitaire d'achat</label>
+                <input type="number" name="prix" class="form-control" id="prixTTC" placeholder="0.00" required>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Quantité</label>
+                <input type="number" name="quantite" class="form-control" id="prixHT" placeholder="0.00" required>
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">Montant total</label>
+              <input type="number" name="total" class="form-control" id="designation" placeholder="0.00" readonly>
+            </div>
+
+            <div class="text-end">
+              <button type="submit" class="btn btn-primary px-4">AJOUTER</button>
+            </div>
+          </form>
+
+                                    </div>
+                                </div>
+                            </div>
+                      </div>
+
+					</div>
+				</div>
+			{% block stock %}
+				<div class="card">
+					<div class="card-body">
+						<div class="table-responsive">
+							<table class="table style-1" id="ListDatatableView">
+								<thead>
+									<tr>
+										<th>N°</th>
+										<th>Article</th>
+										<th>Fournisseur</th>
+										<th>Prix & Quantite</th>
+										<th>Date </th>
+										<th>Total</th>
+										<th>Action</th>
+									</tr>
+								</thead>
+								<tbody>
+									{% for i in stock %}
+									<tr>
+										<td>
+											<h6>{{i.id}}</h6>
+										</td>
+										<td>
+											<div class="media style-1">
+												<a href="/detail_article/?usr={{usr}}&com={{com}}&article={{i.id_article}}"><img src="{% static i.photo_article %}" class="img-fluid mr-3" alt=""></a>
+												<div class="media-body">
+													<h6>{{i.article}}</h6>
+													<span>{{i.type_article}}</span>
+												</div>
+											</div>
+										</td>
+										<td>
+											<div class="media style-1">
+											{% if i.fournisseur == '' and i.type_fournisseur == '' %}
+												<a href="#"><img src="{% static i.photo_fournisseur %}" class="img-fluid mr-3" alt=""></a>
+												<div class="media-body">
+													<span class="badge badge-danger light">Aucun</span>
+											{% else %}
+												<a href="/details_fournisseur/?usr={{usr}}&com={{com}}&acteur={{i.id_fournisseur}}"><img src="{% static i.photo_fournisseur %}" class="img-fluid mr-3" alt=""></a>
+												<div class="media-body">
+													<h6>{{i.fournisseur}}</h6>
+													<span>{{i.type_fournisseur}}</span>
+											{% endif %}
+												</div>
+											</div>
+										</td>
+										<td>
+											<div>
+													<h6>{{i.prix}} {{i.devise}}</h6>
+													<span>{{i.quantite}}</span>
+											</div>
+										</td>
+										<td>
+											<div>
+													<h6>{{i.date}}</h6>
+													<span>{{i.heure}}</span>
+											</div>
+										</td>
+										<td>
+											<div>
+												<span class="badge badge-success light">{{i.total}}{{i.devise}}</span>
+											</div>
+										</td>
+										<td>
+											<div class="d-flex action-button">
+												<a href="/modifier_stock/?usr={{usr}}&com={{com}}&stock={{i.uuid}}" class="btn btn-primary shadow btn-xs sharp mr-1"><i class="fa fa-pencil"></i></a>
+												<button type="button" class="btn btn-danger shadow btn-xs sharp" data-toggle="modal" data-target="#modal{{i.id}}"><i class="fa fa-trash"></i></button>
+												<!-- Modal -->
+                        <div class="modal fade" id="modal{{i.id}}">
+									          <div class="modal-dialog modal-dialog-centered" style="max-width: 50vw">
+									              <div class="modal-content">
+									                <div class="modal-header">
+									                  <h5 class="modal-title">Confirmation</h5>
+									                  <button type="button" class="close" data-dismiss="modal"><span>&times;</span> </button>
+									                </div>
+									                <div class="modal-body">
+                                    <p>Voulez-vous vraiment supprimer le stock <strong>N°{{i.id}}</strong> ? Cette action est irrersible et elle entrainera : <br><br> La suppression dudit stock, ce qui affectera toutes les statistiques financières.</p>
+                                  </div>
+                                  <div class="modal-footer">
+													          <form id="formArticle" action="{% url 'delete_stock' %}" method="post">
+													            <div class="mb-3">
+													            	{% csrf_token %}
+													              <input type="hidden" name="usr" value="{{usr}}">
+													              <input type="hidden" name="com" value="{{com}}">
+													              <input type="hidden" name="stock_id" value="{{i.uuid}}">
+													            </div>
+													            <div class="text-end">
+													              <button type="submit" class="btn btn-danger light px-4">Supprimer</button>
+													          </form>
+													            </div>
+													          		<button type="button" class="btn btn-primary px-4 mt-2" data-dismiss="modal">Annuler</button>
+									               </div>
+									           </div>
+									       </div>
+									     </div>
+									     <a href="/details_stock/?usr={{usr}}&com={{com}}&stock={{i.uuid}}" class="btn btn-info shadow btn-xs sharp ml-1"><i class="fa fa-eye"></i></a>
+										</td>
+									</tr>
+								{% endfor %}
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+			{% endblock %}
+			</div>
+		</div>
+{% endblock %}
